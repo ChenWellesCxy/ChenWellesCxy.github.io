@@ -1,0 +1,56 @@
+:root {
+  --color-paper: oklch(99% 0.006 255);
+  --color-paper-2: oklch(97.2% 0.006 255);
+  --color-paper-3: oklch(94.5% 0.006 255);
+  --color-ink: oklch(16% 0.010 255);
+  --color-ink-2: oklch(31% 0.012 255);
+  --color-muted: oklch(50% 0.010 255);
+  --color-rule: oklch(88% 0.008 255);
+  --color-rule-strong: oklch(72% 0.012 255);
+  --color-accent: oklch(45% 0.19 264);
+  --color-accent-ink: oklch(99% 0.006 255);
+  --color-focus: oklch(42% 0.20 264);
+  --color-plate: oklch(16% 0.010 255);
+  --color-plate-ink: oklch(96% 0.006 255);
+  --color-plate-muted: oklch(76% 0.008 255);
+  --color-plate-rule: oklch(38% 0.012 255);
+
+  --font-display: "Arial Narrow", "Aptos Narrow", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-body: "Segoe UI Variable Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-2xs-negative: -0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+  --space-4xl: 9rem;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.25rem;
+  --text-lg: 1.5625rem;
+  --text-xl: 1.9531rem;
+  --text-2xl: 2.4414rem;
+  --text-3xl: 3.0518rem;
+  --text-display: clamp(2.75rem, 5vw + 1rem, 5.25rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 180ms;
+  --dur-long: 420ms;
+
+  --rule-thin: 1px;
+  --rule-bold: 2px;
+  --focus-inset: -2px;
+  --radius-none: 0;
+  --page-gutter: clamp(1rem, 4vw, 3.5rem);
+  --page-max: 76rem;
+}
