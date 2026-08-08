@@ -9,20 +9,20 @@ const RESOURCES = {
       value: "给你从验证工程思维切换到 Agent system engineering 的统一框架。"
     },
     {
-      type: "学习指南",
-      title: "ai-agent-book · Learning Guide",
-      url: "https://github.com/bojieli/ai-agent-book/blob/main/docs/zh-CN/LEARNING.md",
-      description: "配套章节分组和实践建议，用于控制学习深度。",
-      focus: "看章节之间的依赖，不追求把所有实验从头刷到尾。",
-      value: "帮助你坚持项目驱动，而不是把 8 周变成读书打卡。"
+      type: "Context",
+      title: "Anthropic · Effective Context Engineering for AI Agents",
+      url: "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      description: "从生产 Agent 角度讲解 context 如何被选择、压缩、隔离与按需拉取。",
+      focus: "context rot、compaction、structured notes、tool result 与长时任务的信息保真。",
+      value: "你的 waveform / log / spec 都是大 context；这篇更直接回答怎么只给 Agent 当前判断真正需要的证据。"
     },
     {
-      type: "模型补洞",
-      title: "Hugging Face LLM Course · Inference Deep Dive",
-      url: "https://huggingface.co/learn/llm-course/chapter1/8",
-      description: "从工程视角理解推理路径、时延与上下文成本。",
-      focus: "prefill / decode、KV cache、TTFT / TPOT。",
-      value: "你已有 AI 背景，只补 Agent 性能和 context engineering 真正会用到的部分。"
+      type: "Agent Runtime",
+      title: "OpenAI · Agents SDK",
+      url: "https://developers.openai.com/api/docs/guides/agents",
+      description: "当前官方 Agent runtime 指南，覆盖 tools、handoffs、sessions、tracing 与 approvals。",
+      focus: "先手写最小 loop，再对照 SDK 看 tool boundary、trace 和 human approval 如何工程化。",
+      value: "比泛读 LLM inference 更贴近你的 8 周目标：把验证流程做成可观测、可审批的 Agent 系统。"
     }
   ],
   tools: [
@@ -109,28 +109,28 @@ const RESOURCES = {
       value: "目标不是 8 周变成 UVM 专家，而是让 Agent 方案能听懂工业 DV 的语言和边界。"
     },
     {
-      type: "AI4IC Paper",
-      title: "AutoChip · Automating HDL Generation Using LLM Feedback",
-      url: "https://arxiv.org/abs/2311.04887",
-      description: "把 compiler / simulator feedback 放进 HDL generation / repair loop 的代表工作。",
-      focus: "external verifier 如何给 LLM 下一轮生成提供约束。",
-      value: "核心启示是 simulation result 才是证据，LLM 的“反思”不是验证。"
+      type: "DV Agent",
+      title: "UCAgent · UnityChip Verification AI-Agent",
+      url: "https://github.com/XS-MLVP/UCAgent",
+      description: "开源 block-level 功能验证 Agent，从 DUT 分析、test generation 到 coverage / report 串起完整 workflow，并支持 MCP / coding agents 协同。",
+      focus: "看它如何分阶段、做一致性检查、跑 coverage closure，而不是照搬整套框架。",
+      value: "它比早期的单点 HDL feedback demo 更像你真正的 DV 业务，可直接对照 Project A 的分层。"
     },
     {
-      type: "AI4IC Code",
-      title: "AutoChip · GitHub",
-      url: "https://github.com/shailja-thakur/AutoChip",
-      description: "AutoChip 的公开实现，包含 Icarus Verilog feedback 组织方式。",
-      focus: "读 eval / feedback interface，不需要照搬整个项目。",
-      value: "是你自己写最小 verification loop 时很好的代码级参照。"
+      type: "RTL Agent",
+      title: "NVIDIA · ACE-RTL",
+      url: "https://github.com/NVlabs/ACE-RTL",
+      description: "2026-07 开源的 RTL generation / verification / iterative repair Agent，用 Generator、Reflector、Coordinator 组织 tool feedback 与可演化 context。",
+      focus: "context evolution、verification feedback 如何进入下一次 repair，以及它与 CVDP 的评测接口。",
+      value: "它是当前很新的开源参照，但你要借鉴的是 verifier-guided loop，不是把重心变成 RTL 生成。"
     },
     {
-      type: "Testbench Agent",
-      title: "AutoBench",
-      url: "https://github.com/AutoBench/AutoBench",
-      description: "LLM 驱动的 testbench generation 项目与评测路线。",
-      focus: "如何生成 verification artifact，以及测试本身如何被评价。",
-      value: "提醒你 TB “能运行”远远不等于 TB “可信”。"
+      type: "Latest Paper",
+      title: "GoGoTB · Specification-Grounded Coverage Closure",
+      url: "https://arxiv.org/abs/2607.26181",
+      description: "2026-07 的端到端 agentic RTL verification 工作，强调 deterministic enforcement 与 spec-grounded functional coverage closure。",
+      focus: "spec behavior → testpoint / coverage bin → gap RCA → targeted remediation 的闭环。",
+      value: "这比“TB 生成了且能跑”更接近你要的工业验证标准；论文已公开，但作者尚未发布完整代码。"
     },
     {
       type: "Testbench Eval",
@@ -159,12 +159,12 @@ const RESOURCES = {
       value: "这是与你计划中的 waveform-debug agent 最接近、最值得源码学习的公开项目之一。"
     },
     {
-      type: "Waveform Debug",
-      title: "VeriDebugger",
-      url: "https://github.com/hernantech/veridebugger",
-      description: "围绕 compile → simulate → VCD analysis → fix 的 Agent loop demo。",
-      focus: "VCD analysis tool 如何接到 agent loop；同时注意它与工业级 debug 的成熟度差距。",
-      value: "适合作为最小架构参考，帮助你快速做出可运行的 waveform-debug POC。"
+      type: "Waveform Tool",
+      title: "wavepeek · Deterministic RTL Waveform CLI",
+      url: "https://github.com/kleverhq/wavepeek",
+      description: "面向 scripts、CI 和 LLM workflows 的确定性 VCD / FST / FSDB 查询 CLI，提供 bounded、machine-friendly 的波形操作。",
+      focus: "scope / signal / value / change / property / extract 及 JSON schema，特别看有界 time-window query。",
+      value: "这几乎就是你 Project A 的 waveform tool layer：模型选择查什么，数值与边沿由工具给出。"
     },
     {
       type: "Circuit Context",
@@ -173,6 +173,14 @@ const RESOURCES = {
       description: "把 netlist / EDA 数据转成 property graph 与 relational IR 的数据基础设施。",
       focus: "hierarchy、connectivity、graph IR 怎样代替“把整个电路当普通文本 RAG”。",
       value: "对 waveform debug 很关键：模型需要结构化路径和连接关系，而不是海量原始波形。"
+    },
+    {
+      type: "Latest Paper",
+      title: "VeriTrace · Agentic Temporal Exploration",
+      url: "https://arxiv.org/abs/2608.02878",
+      description: "2026-08 的最新 waveform-debug 方法：Agent 独立选择 signal、time window 和 iteration depth，用查询驱动假设检验。",
+      focus: "不把整份 VCD 塞进 context；观察 Inspector 如何逐步扩大 / 缩小时域和信号集。",
+      value: "这与你的人工 debug 方式几乎同构，可以直接变成 wavepeek 之上的 Agent policy；当前是论文，代码尚未公开。"
     }
   ],
   fullcustom: [
@@ -194,19 +202,19 @@ const RESOURCES = {
     },
     {
       type: "Analog Agent",
-      title: "AnalogCoder",
-      url: "https://github.com/laiyao1/AnalogCoder",
-      description: "training-free LLM analog design agent，将 analog design formulation 转成可执行代码。",
-      focus: "analog problem 如何 formalize，以及 domain knowledge 怎样落到 tool execution。",
-      value: "帮你抽象 full-custom verification agent 的 domain/tool interface。"
+      title: "AnalogCoder-Pro",
+      url: "https://github.com/laiyao1/AnalogCoderPro",
+      description: "TCAD 2026 的 AnalogCoder 后续版，统一 topology generation、device sizing、ngspice 验证与多模态 waveform diagnosis / repair。",
+      focus: "spec → netlist → simulation → waveform diagnosis → repair / optimization 的端到端边界。",
+      value: "它比原 AnalogCoder 更接近你的 Full-Custom Waveform Agent，且仍能用公开 ngspice 环境研究。"
     },
     {
       type: "Analog Optimization",
-      title: "AutoCkt",
-      url: "https://github.com/ksettaluri6/AutoCkt",
-      description: "用 deep RL 做 analog circuit sizing 的经典开源项目，可结合 NGSpice。",
-      focus: "spec / PVT / reward / circuit sizing 的形式化方式。",
-      value: "让你看到 AI4EDA 不只有 LLM；连续优化与仿真闭环同样重要。"
+      title: "AutoSizer",
+      url: "https://github.com/yuxi120407/AutoSizer",
+      description: "2026 的 reflective LLM-driven AMS sizing 框架，用外层 Agent 调整搜索空间，内层数值优化 + simulation 执行，并附 24 个 SKY130 电路的 AMS-SizingBench；当前仓库仍标注 under construction。",
+      focus: "优先读 two-loop architecture、search-space adaptation、simulation-grounded objective 和 benchmark，暂不当作 8 周必跑依赖。",
+      value: "它比经典 AutoCkt 更适合你现在的 Agent 路线：LLM 负责策略，optimizer / simulator 负责数值和判真。"
     },
     {
       type: "Analog Optimization",
@@ -241,12 +249,12 @@ const RESOURCES = {
       value: "扩展你对“Agent 后面应该接什么样的 analog verifier”的想象。"
     },
     {
-      type: "Analog Layout",
-      title: "ALIGN",
-      url: "https://github.com/ALIGN-analoglayout/ALIGN-public",
-      description: "从 analog netlist 自动生成 layout 的开放基础设施。",
-      focus: "了解 analog automation 的后端边界，不作为当前主线复现。",
-      value: "帮助你把 full-custom Agent 放进更完整的 design → verify → layout 生命周期。"
+      type: "Memory Substrate",
+      title: "OpenRAM · Open-Source SRAM Compiler",
+      url: "https://github.com/VLSIDA/OpenRAM",
+      description: "成熟的开源 SRAM compiler，可产生 layout、SPICE / Verilog netlist、timing / power model，并支持开源 technology 与 SPICE characterization。",
+      focus: "bitcell array、precharge / sense amp / write driver / replica bitline 结构，以及 characterization 如何测 delay / power。",
+      value: "公开 DRAM Agent 项目仍很少；OpenRAM 是目前最好的合法公开 memory 代理场，让你用 SRAM + SPICE 表现 DRAM verification 的方法论而不碰公司 IP。"
     }
   ],
   eval: [
@@ -268,19 +276,19 @@ const RESOURCES = {
     },
     {
       type: "Benchmark",
-      title: "NVIDIA · VerilogEval",
-      url: "https://github.com/NVlabs/verilog-eval",
-      description: "RTL generation 的公开 dataset 与 evaluation harness。",
-      focus: "functional correctness、pass@k、任务组织和可复现 testbench。",
-      value: "重点学 benchmark 怎么设计，再迁移到你的 verification / RCA cases。"
+      title: "NVIDIA · CVDP Benchmark",
+      url: "https://github.com/NVlabs/cvdp_benchmark",
+      description: "面向 hardware verification 的新一代 LLM / Agent benchmark，同时支持 direct-model 与 Docker-based agentic workflow。",
+      focus: "isolated execution、test harness、agent change tracking、single-run / pass@k 以及自定义 Agent 接入。",
+      value: "它比旧 VerilogEval 更贴近你要评的“验证 Agent”而不是单次 RTL 生成，可直接借鉴作品的 eval harness。"
     },
     {
       type: "Benchmark",
-      title: "RTLLM",
-      url: "https://github.com/hkust-zhiyao/RTLLM",
-      description: "面向 LLM RTL generation 的 benchmark / evaluation 路线。",
-      focus: "比较任务难度、functional correctness 与生成策略的评价方式。",
-      value: "给你构建 ≥30 case mutation benchmark 提供第二个参照系。"
+      title: "HWE-Bench · Real-World Hardware Bug Repair",
+      url: "https://github.com/pku-liang/hwe-bench",
+      description: "2026 开源的 repository-scale hardware agent benchmark，收录 417 个真实历史 bug-fix case，覆盖 OpenTitan、Ibex、CVA6、XiangShan 等项目。",
+      focus: "bug report → repo-level localization / repair → 容器化 native simulation 的 fail-to-pass 判定。",
+      value: "它是你做 ≥30 个验证 / RCA case 的更强范本：gold 来自执行结果，不是 LLM judge。"
     },
     {
       type: "Domain LLM",
@@ -291,12 +299,12 @@ const RESOURCES = {
       value: "帮助你到最后再判断是否真的需要训练模型，而不是一开始就做 Chip LLM。"
     },
     {
-      type: "Serving",
-      title: "vLLM · Documentation",
-      url: "https://docs.vllm.ai/en/latest/",
-      description: "高吞吐 LLM serving 与 OpenAI-compatible API 的官方文档。",
-      focus: "只有当本地 / 私有部署成为项目约束时再深入 serving 与 tool calling。",
-      value: "部署是 production 能力，但不能抢走 Agent + EDA 闭环的主线时间。"
+      type: "Agent Eval",
+      title: "Anthropic · Demystifying Evals for AI Agents",
+      url: "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents",
+      description: "2026 的 Agent eval 工程指南，从 task / trial、grader、transcript / trace 到失败分类和回归集。",
+      focus: "如何把多步 tool-using Agent 拆成可重跑的场景、结果检查与 trajectory-level 分析。",
+      value: "比 serving 更符合你最后两周的主线：作品要用证据证明改进，而不是只展示 demo。"
     },
     {
       type: "Landscape",
