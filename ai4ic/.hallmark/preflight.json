@@ -1,0 +1,19 @@
+{
+  "date": "2026-08-09",
+  "scope": "single-page",
+  "framework": "vanilla-html",
+  "existing_font_stack": "Inter/system sans + system mono",
+  "existing_palette": "light/dark dashboard with orange accent plus blue/green helpers",
+  "existing_motion": "CSS hover/state transitions; no motion library",
+  "preserve": [
+    "static GitHub Pages implementation",
+    "AI4IC content and public-only security boundary",
+    "hash-based single-page access"
+  ],
+  "redesign": [
+    "dashboard navigation",
+    "daily schedule UI",
+    "progress UI",
+    "visual palette and component language"
+  ]
+}
