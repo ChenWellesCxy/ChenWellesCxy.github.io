@@ -105,10 +105,25 @@ main {
 .knowledge-map {
   position: relative;
   isolation: isolate;
+  display: grid;
+  gap: var(--space-sm);
   min-height: 0;
   margin-block-start: var(--space-xl);
+  padding-block: var(--space-md);
+  padding-inline-start: var(--space-xl);
   border-block: var(--rule-thin) solid var(--color-rule-strong);
   background: var(--color-paper);
+}
+
+.knowledge-map::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--space-xl);
+  inset-inline-start: var(--space-md);
+  z-index: 0;
+  width: var(--rule-thin);
+  background: var(--color-rule-strong);
+  pointer-events: none;
 }
 
 .map-rails {
@@ -131,6 +146,7 @@ main {
 
 .map-node {
   position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 2.5rem minmax(0, 1fr);
   grid-template-areas:
@@ -139,23 +155,41 @@ main {
   align-items: center;
   min-height: 5.25rem;
   padding: var(--space-sm) var(--space-md);
-  border-block-end: var(--rule-thin) solid var(--color-rule);
+  border: var(--rule-thin) solid var(--color-rule-strong);
   background: var(--color-paper);
   text-decoration: none;
   transition: transform var(--dur-short) var(--ease-out);
 }
 
+.map-node::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: calc(0rem - var(--space-lg));
+  width: var(--space-lg);
+  height: var(--rule-thin);
+  background: var(--color-rule-strong);
+  pointer-events: none;
+}
+
 .map-node::after {
   content: "";
   position: absolute;
-  inset-block: 0;
-  inset-inline-start: 0;
-  width: var(--rule-bold);
-  background: transparent;
+  inset-block-start: 50%;
+  inset-inline-start: calc(0rem - var(--space-lg));
+  width: var(--space-xs);
+  height: var(--space-xs);
+  border: var(--rule-thin) solid var(--color-rule-strong);
+  background: var(--color-paper);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .map-node:focus-visible::after,
-.map-node:hover::after { background: var(--color-accent); }
+.map-node:hover::after {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
 
 .map-node:focus-visible {
   outline: var(--rule-bold) solid var(--color-focus);
@@ -196,6 +230,11 @@ main {
   color: var(--color-plate-ink);
   background: var(--color-plate);
   border-color: var(--color-plate-rule);
+}
+
+.node-core::after {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
 }
 
 .node-core .core-mark {
@@ -565,9 +604,16 @@ main {
   }
 
   .knowledge-map {
+    display: block;
     min-height: 30rem;
     margin-block-start: var(--space-lg);
+    padding-block: 0;
+    padding-inline-start: 0;
   }
+
+  .knowledge-map::before,
+  .map-node::before,
+  .map-node::after { display: none; }
 
   .map-edges {
     position: absolute;
