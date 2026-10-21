@@ -540,12 +540,12 @@ function route() {
   if (!id || !SECTIONS[id]) {
     home.hidden = false;
     detail.hidden = true;
-    document.title = "AI4IC · Learning Map";
+    document.title = "AI4IC 学习图谱 | ChenWellesCxy HUST";
   } else {
     renderDetail(id);
     home.hidden = true;
     detail.hidden = false;
-    document.title = `${TITLES[id]} · AI4IC Learning Map`;
+    document.title = `${TITLES[id]} · AI4IC | ChenWellesCxy HUST`;
   }
   window.scrollTo({ top: 0, behavior: "auto" });
 }
@@ -555,3 +555,4 @@ window.addEventListener("DOMContentLoaded", route);
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && location.hash) location.hash = "";
 });
+
