@@ -1,0 +1,236 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>独立实现 CoverageModel：从规范需求到可维护的验证模型 | ChenWellesCxy HUST</title><meta name="description" content="SV / UVM 学习教程、实验与 CoverageModel 实践。"><link rel="canonical" href="https://chenwellescxy.github.io/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html"><link rel="stylesheet" href="/site-shell.css"><link rel="stylesheet" href="/sv-uvm/style.css"></head><body><a class="skip" href="#content">跳到内容</a><header class="cw-site-header"><div class="cw-bar"><a class="cw-brand" href="/">ChenWellesCxy <span>HUST</span></a><nav class="cw-links" aria-label="网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><details class="cw-mobile"><summary>导航</summary><nav aria-label="手机网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></details></div></header><div class="reader"><aside><a class="back" href="/sv-uvm/">← SV / UVM 学习目录</a><details open><summary>本页章节</summary><nav aria-label="本页章节"><a href="#权威边界参考实现不是协议规范">权威边界：参考实现不是协议规范</a><a href="#总体数据流">总体数据流</a><a href="#第一步把需求写成可验收的规则">第一步：把需求写成可验收的规则</a><a href="#第二步确定最小且完整的数据模型">第二步：确定最小且完整的数据模型</a><a href="#第三步设计采样层分清引脚与事务">第三步：设计采样层，分清引脚与事务</a><a href="#第四步命令译码与错误隔离">第四步：命令译码与错误隔离</a><a href="#第五步事件状态和调度规则">第五步：事件、状态和调度规则</a><a href="#第六步timing-检查器">第六步：timing 检查器</a><a href="#第七步functional-coverage-设计">第七步：functional coverage 设计</a><a href="#第八步何时做生成器">第八步：何时做生成器</a><a href="#第九步验证与验收矩阵">第九步：验证与验收矩阵</a><a href="#推荐的交付物结构">推荐的交付物结构</a><a href="#与学习实验的关系">与学习实验的关系</a></nav></details><details><summary>其他文档</summary><nav aria-label="专题文档"><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a><a href="/sv-uvm/docs/SV%E6%95%99%E7%A8%8B.html">从 Pattern 到 SystemVerilog</a><a href="/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html">UVM 入门教程</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html">SV 语言基础详解</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">SV 验证主题详解</a><a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html">UVM 官方资料详解</a><a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html" aria-current="page">独立实现 CoverageModel</a><a href="/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html">参考项目精读</a><a href="/sv-uvm/labs/03_uvm/README.html">UVM 简化存储器实验</a><a href="/sv-uvm/docs/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5.html">开源项目实践</a><a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html">免费 SV/UVM 环境选型</a><a href="/sv-uvm/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.html">环境与验证记录</a><a href="/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html">学习资源调研</a></nav></details></aside><main id="content"><div class="doc-top"><div class="eyebrow">SV / UVM · 动手实践</div><h1>独立实现 CoverageModel：从规范需求到可维护的验证模型</h1><div class="source">项目文档快照 · 2026-10-21 · <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning/blob/f09cfdaf87f25dce129bcc9a6b7c7824387e9d4b/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.md">查看原文 ↗</a></div></div><article><p>这份路线图的目标是让你最终能独立设计并实现一套 CoverageModel，而不是只会读或修改别人生成的 SV。你有 DRAM/FineSim 项目经验，已经熟悉命令、bank、MR 与时序约束；需要补齐的是把这些协议知识转成可追踪的数据模型、采样器、检查器和覆盖模型的工程方法。</p>
+<h2 id="权威边界参考实现不是协议规范">权威边界：参考实现不是协议规范</h2>
+<p><code>RefProject/.../新版/SV文件</code> 下的 LPDDR6 代码是他人提供的<strong>实现与学习素材</strong>。它能展示一种 SV 组织方式，也能让你看到复杂命令采样、状态派生和 coverage 的代码规模，但它不是 JEDEC 规范的替代品，也不能单凭生成代码名称证明协议含义正确。</p>
+<p>实现时请按以下证据顺序决策：</p>
+<ol>
+<li><strong>适用版本的正式协议规范、勘误和项目认可的设计/验证需求</strong>：定义命令编码、合法状态转换、时序值、例外模式及配置条件。遵循团队规定的保密与访问要求；不要把受限规范上传到个人 GitHub 或公开仓库。</li>
+<li><strong>经过评审的项目决策与验证计划</strong>：记录规范未覆盖、解释存在分歧或由芯片实现限定的行为，并明确批准人/版本。</li>
+<li><strong>RTL、现存 testbench 与历史 pattern 的观测行为</strong>：帮助理解 DUT 接口和已有工程约定，但若与批准需求冲突，应提出问题，不能悄悄把现状当作规范。</li>
+<li><strong>参考 CoverageModel 与开源示例</strong>：作为架构/语法例子；逐条追溯其假设与输入，再决定是否采用。</li>
+</ol>
+<p>每一条 checker 和 coverpoint 都要能回答：“这来自哪条批准需求？”这条追踪关系比生成器复杂度或 coverage 百分比更重要。</p>
+<h2 id="总体数据流">总体数据流</h2>
+<pre><code class="language-text">规范条目/验证需求
+        │  拆成可验证的规则、模式、边界和豁免
+        ▼
+需求追踪表 ───────────────► directed/random stimulus + reference checks
+        │                                  │
+        ▼                                  ▼
+事务/协议数据模型 ◄────── pin sampling / transaction monitor
+        │                                  │
+        ├── 命令译码与合法性 ──────────────┘
+        ├── 每 bank / rank / mode 状态
+        ├── 时序历史与约束检查
+        └── 可解释的命令/状态/时序 coverage
+                         │
+                         ▼
+            回归、波形、报告、失败复现
+                         │
+                         └────► 模型修正与需求追踪更新
+</code></pre>
+<p>生成器是后续的实现手段，不应成为流程起点。先验证少量手写规则的语义和测试，再抽象稳定的重复结构。</p>
+<h2 id="第一步把需求写成可验收的规则">第一步：把需求写成可验收的规则</h2>
+<p>不要从“覆盖所有 timing”这种大目标直接开始编码。每条需求写成一行可检查的条目，至少包含：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>例子（仅教学抽象）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ID / 来源</td>
+<td><code>BANK-RD-001</code> / 经批准的协议需求编号</td>
+</tr>
+<tr>
+<td>前置状态</td>
+<td>目标 bank 已由 ACT 打开</td>
+</tr>
+<tr>
+<td>触发事件</td>
+<td>收到对同一 bank 的 RD</td>
+</tr>
+<tr>
+<td>规则</td>
+<td>ACT 到 RD 的间隔不得小于配置的 <code>tRCD</code></td>
+</tr>
+<tr>
+<td>单位与边界</td>
+<td>使用明确的 CK cycle 计数；等于边界是否合法</td>
+</tr>
+<tr>
+<td>模式条件</td>
+<td>速率/模式/子通道条件，或明确“不适用”</td>
+</tr>
+<tr>
+<td>检查动作</td>
+<td>接受/报告违规；错误码和报告上下文</td>
+</tr>
+<tr>
+<td>coverage 目标</td>
+<td>低于边界、恰好边界、超过边界（若各场景均有意义）</td>
+</tr>
+<tr>
+<td>验证证据</td>
+<td>定向向量、断言/scoreboard 结果、coverage bin</td>
+</tr>
+</tbody>
+</table>
+<p>真实 DRAM 参数、命令前置条件、例外项和单位只能从适用规范与批准需求中填入，不能照抄教学例子。需求里含模糊词如“足够等待”时，应先澄清单位、取整方法、开闭区间、模式切换时生效的值及复位行为，再编码。</p>
+<h2 id="第二步确定最小且完整的数据模型">第二步：确定最小且完整的数据模型</h2>
+<p>先画对象与作用域，避免状态变量只有名字没有生命周期：</p>
+<ul>
+<li><strong>Command event</strong>：一次已译码命令的时间戳、命令种类、目标 rank/sub-channel/bank group/bank、行列地址、模式/标志、原始采样引用、有效性与无效原因。</li>
+<li><strong>采样 raw sample</strong>：物理引脚各采样相位、边沿/周期信息及未知值信息；保留它便于解释 decoder 为什么作出某个判断。</li>
+<li><strong>Bank state</strong>：每个 bank 的 open/closed、当前行、最近 ACT/PRE/RD/WR 等历史时间；明确状态是 per-rank、per-sub-channel 还是跨域共享。</li>
+<li><strong>Timing context</strong>：规范参数的来源、当前配置、换算后的整数单位、取整方向和是否已初始化。尽可能将单位集中，不在各 checker 中混用 <code>realtime</code>、ps 和 cycle。</li>
+<li><strong>Violation record</strong>：规则 ID、起止命令、实际间隔、要求间隔、目标层级与时间，确保一条失败能直接定位波形和需求。</li>
+<li><strong>Coverage view</strong>：只包含你要统计的可观察场景，和状态/checker 数据之间有清楚定义；不要把 covergroup 变量当唯一状态存储。</li>
+</ul>
+<p>SV 落地可以先用 <code>typedef enum</code> 表示命令、<code>typedef struct packed/unpacked</code> 表示 event/record、<code>package</code> 共享类型。先明确字段语义和初始化，再决定 class、interface、event 或 virtual interface。不要为了像 UVM 而过早引入 factory、config_db 或大量 class 层次。</p>
+<h3 id="小型教学模型不是-jedec-命令协议">小型教学模型（不是 JEDEC 命令协议）</h3>
+<p>本学习项目的 <code>labs/04_coverage/tb.sv</code> 会构造一个<strong>教学命令集</strong>，简化为 <code>ACT</code>、<code>RD</code>、<code>PRE</code>。它用于练“事件 + 同 bank 的 tRCD 间隔 + 边界计数”，不模拟真实 CA 编码，也不代表 JEDEC 的命令格式或全部时序行为。</p>
+<p>概念上，模型接收 <code>ACT(bank)</code> 时保存该 bank 的打开周期 <code>act_cycle[bank]</code>；收到同 bank 的 <code>RD</code> 时计算：</p>
+<pre><code class="language-text">elapsed = current_cycle - act_cycle[bank]
+legal   = bank_is_open[bank] &amp;&amp; elapsed &gt;= teaching_tRCD
+</code></pre>
+<p><code>PRE(bank)</code> 关闭该 bank。测试至少安排 <code>elapsed = tRCD - 1</code>、<code>elapsed = tRCD</code>、<code>elapsed = tRCD + 1</code>，并确认同 bank 与不同 bank 的历史不会串用。这个示例具体边界只对教学模型成立；真正项目应从权威需求定义比较符号、事件计数时点和重开/关闭语义。</p>
+<h2 id="第三步设计采样层分清引脚与事务">第三步：设计采样层，分清引脚与事务</h2>
+<p>采样层回答“什么时候、从哪些物理量构造观察记录”，不负责替协议规范作判断。</p>
+<ol>
+<li>固定采样时钟/边沿和复位语义；说清楚 reset 期间是否丢弃样本，X/Z 信号怎样处理。</li>
+<li>如果命令由多个边沿/周期组成，保留每一相位和有效性；不要在相位不完整时制造一个貌似合法的事务。</li>
+<li>标记 sub-channel/rank 等物理来源，避免交错流互相污染。</li>
+<li>先输出 raw sample 或明确的 invalid record，再让 decoder 作语义判定；避免采样器一边猜命令、一边改协议状态。</li>
+<li>通过可控 stimulus 验证边沿和相位：单个输入变化应在预期时间只产生一次观测。</li>
+</ol>
+<p>若架构基于 transaction-level 输入而不是 pins，也要定义 transaction 的产生者和时序语义；不能因为 stimulus 已给出 <code>RD</code> 就省略 monitor 对 DUT 实际行为的观察，除非验证目标明确只测模型本身。</p>
+<h2 id="第四步命令译码与错误隔离">第四步：命令译码与错误隔离</h2>
+<p>把译码拆成可单测的步骤：</p>
+<ol>
+<li><strong>采样合法性</strong>：必要相位齐全、相关 bits 已知、采样序号完整。</li>
+<li><strong>编码匹配</strong>：由规范表把原始字段映射到候选命令。</li>
+<li><strong>操作数提取</strong>：抽取 bank、地址、模式等字段。</li>
+<li><strong>上下文补全</strong>：只在规范定义的多拍命令确实满足前序条件时组合字段。</li>
+<li><strong>资格判定</strong>：rank/channel/filter 等观测范围限定。</li>
+<li><strong>结果发布</strong>：生成 immutable-by-convention event，附上 <code>valid</code>、原因码和原始观测引用。</li>
+</ol>
+<p>对 <code>unknown</code>、illegal encoding、丢相位、X/Z、复位重入及重叠事务分别定义行为。未知命令不能被静默映射成 NOP；否则可能丢掉真实失败，也会错误提高 coverage。每个失败至少能区分“物理采样不完整”“编码不识别”“被明确 filter”三种原因。</p>
+<h2 id="第五步事件状态和调度规则">第五步：事件、状态和调度规则</h2>
+<p>事件负责通知消费者某个阶段已发生，transaction/event 才携带数据。先写明顺序契约，例如：</p>
+<pre><code class="language-text">采样记录完成 → decoder 返回 event → event 放入队列/稳定变量
+→ 状态模型消费 event → checker 计算并报告 → coverage 按已定义的采样快照记录
+</code></pre>
+<p>SV 中多个 <code>always @(same_event)</code> 会在同一仿真时间步醒来，过程之间没有可依赖的执行先后。若 coverpoint 既读取本次 event，又读取由另一个 listener 刚更新的状态，就可能产生 race。应通过明确阶段（例如一个集中 dispatcher 顺序调用状态/check/coverage task、clocking block、队列消费或后续采样事件）制定稳定契约，并以波形/仿真器支持情况验证。单纯把多个过程挂在同一事件上不等于建立先后顺序。</p>
+<p>状态更新应由一个明确 owner 执行，定义：</p>
+<ul>
+<li>reset 初值和复位中断的事务如何清理；</li>
+<li>状态转移的先决条件与失败行为；</li>
+<li>bank/rank/channel 的索引域；</li>
+<li>合法命令与违规命令是否仍更新状态（依需求决策）；</li>
+<li>一次 event 是否可以多次消费，如何防止重复更新。</li>
+</ul>
+<p>建议先实现单 bank，再扩成数组和多 sub-channel。把“状态更新”和“断言违规”职责分开：看到非法命令后究竟保持旧状态、标记未知还是按模型恢复，必须一致并可解释。</p>
+<h2 id="第六步timing-检查器">第六步：timing 检查器</h2>
+<p>每条 timing rule 写成通用接口：<code>check(rule_id, start_event, end_event, context)</code>，但在引入抽象前先用 1–2 条手写规则验证架构。</p>
+<p>重点边界：</p>
+<ul>
+<li><strong>单位</strong>：cycle 计数还是时间单位；时钟切换后旧时间戳如何解释。</li>
+<li><strong>取整</strong>：从 ns/ps 换算周期时，向上/向下/最近取整分别有什么规范依据。</li>
+<li><strong>边界包含性</strong>：<code>&gt;= min</code>、<code>&gt; min</code>、<code>&lt;= max</code> 或窗口区间；恰好等于边界必须有专门定向测试。</li>
+<li><strong>历史来源</strong>：前序事件必须与目标 bank/rank/channel 匹配；不能取全局“最近一次 ACT”。</li>
+<li><strong>配置变化</strong>：使用起点配置、终点配置还是当前生效配置；需求要给答案。</li>
+<li><strong>缺少历史</strong>：例如没观察到对应 ACT 时，是跳过规则还是报模型同步错误，要分开定义。</li>
+<li><strong>错误输出</strong>：同时打印 rule ID、需求追踪 ID、两端事件、差值、期望值和单位。</li>
+</ul>
+<p>先用独立纯函数计算差值/合法性，再接到 event 流；这样能在不启动整套 TB 的情况下验证单位与边界算法。</p>
+<h2 id="第七步functional-coverage-设计">第七步：functional coverage 设计</h2>
+<p>coverage 是“刺激/监控实际观察了什么”的摘要，不是协议正确性的证明，也不替代 checker。</p>
+<p>从验证计划反推 coverage：</p>
+<ul>
+<li><strong>命令覆盖</strong>：命令类型与合法操作数；只在字段语义有效时采样。</li>
+<li><strong>状态覆盖</strong>：从哪些状态进入/退出，是否观察到恢复/边界状态。</li>
+<li><strong>时序覆盖</strong>：至少覆盖边界附近的区间，如 below/equal/above（仅当该场景对规则有定义）。</li>
+<li><strong>交叉覆盖</strong>：只对有验证意义且 stimulus 可达到的维度做 cross，并控制 bins 数量。</li>
+<li><strong>排除项</strong>：明确 ignore/illegal bin 的理由及需求依据，避免通过忽略难点让 coverage 好看。</li>
+<li><strong>覆盖目标</strong>：每个 bin 绑定一个场景或需求 ID；无法达到的 bin 要分析，而非直接 waive。</li>
+</ul>
+<p>采样时机要和状态契约一致。针对上面的教学 <code>ACT/RD/PRE</code> 模型，可记录命令种类、bank 与 RD 间隔类别；边界计数由独立定向刺激保证，checker 结果保证模型接受/拒绝正确，coverage 再确认三个类别确实都观察到了。</p>
+<h2 id="第八步何时做生成器">第八步：何时做生成器</h2>
+<p>生成器适合把<strong>稳定、规则化、可校验</strong>的重复数据转成代码，例如多组相同结构的 bins 或查表函数。先保持输入声明性：每个规则至少有 ID、源需求、适用条件、单位、范围、处理策略、coverage 目标。</p>
+<p>生成器要分层：</p>
+<ol>
+<li>输入 schema 和语义校验（缺字段、未知策略、区间重叠、单位不匹配时拒绝生成）。</li>
+<li>规范化中间表示（IR），保留来源与追踪信息。</li>
+<li>SV renderer（只负责输出语法，不重新解释需求）。</li>
+<li>输出检查（格式/编译/规则数量/重复 ID/生成文件差异）。</li>
+<li>可重复性（同输入产生相同输出；生成器版本和输入摘要进入报告）。</li>
+</ol>
+<p>不要一开始就生成庞大 interface。优先生成“数据”和重复 coverpoint；采样时序、复杂状态转移、例外处理先用手写且可审阅的代码。生成结果必须可回溯到输入行/需求 ID，并能由小型 golden tests 检查。需要人工判断的含义不应隐藏在模板字符串里。</p>
+<h2 id="第九步验证与验收矩阵">第九步：验证与验收矩阵</h2>
+<p>至少用四层证据：</p>
+<table>
+<thead>
+<tr>
+<th>层次</th>
+<th>验证什么</th>
+<th>通过证据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>单元测试</td>
+<td>译码、索引、单位换算、边界比较</td>
+<td>正常值、最小/最大、未知值与非法值定向向量</td>
+</tr>
+<tr>
+<td>模型测试</td>
+<td>状态转移、bank 隔离、reset</td>
+<td>事件序列后状态符合预期，重复/丢失事件能检测</td>
+</tr>
+<tr>
+<td>checker 测试</td>
+<td>合法/违规时序</td>
+<td>below/equal/above 明确得到预期结果；失败报告可追踪</td>
+</tr>
+<tr>
+<td>coverage 测试</td>
+<td>bin 与交叉是否被实际采到</td>
+<td>对照测试清单逐项命中；未命中场景可解释</td>
+</tr>
+<tr>
+<td>仿真/波形</td>
+<td>采样点、事件顺序、race、复位</td>
+<td>波形中的输入、event、状态、结果对得上</td>
+</tr>
+<tr>
+<td>生成器测试</td>
+<td>输入校验、稳定输出、可追踪</td>
+<td>schema 拒绝错误输入；重复生成无意外 diff；生成代码编译</td>
+</tr>
+<tr>
+<td>回归/维护</td>
+<td>参数组合、模式、并行配置</td>
+<td>固定 seed 可复现；每个失败有摘要和可定位日志</td>
+</tr>
+</tbody>
+</table>
+<p>一个 rule 的验收不能只是“编译通过”。最小闭环应是：<strong>需求 ID → 定向场景 → monitor event → 状态/时序结果 → assertion/checker 报告 → coverage hit → 可复现波形</strong>。</p>
+<h2 id="推荐的交付物结构">推荐的交付物结构</h2>
+<pre><code class="language-text">coverage_model/
+  requirements/       # 追踪表或经过批准的规则输入
+  sv/                 # 手写类型、monitor、状态、checker、coverage
+  generator/          # 后续稳定后再加入
+  tests/              # 单元、规则边界、coverage smoke、golden tests
+  wave/               # 小型回归的波形配置与阅读说明
+  README.md           # 编译器、源文件顺序、运行命令、已知限制
+  traceability.csv    # 需求 ID → 实现 → 测试 → coverage 的映射
+</code></pre>
+<p>实际工作项目需遵守公司仓库布局和数据保密规则；这里是学习时可借鉴的分层建议。</p>
+<h2 id="与学习实验的关系">与学习实验的关系</h2>
+<p>当前教学闭环会逐步从 SV 基础和 coverage 小模型开始。<code>labs/04_coverage/tb.sv</code> 是其中一个刻意缩小的实验：它使用教学版 <code>ACT/RD/PRE</code> 命令，练习命令事件、同 bank 的 tRCD 间隔判断和边界计数。它<strong>不是 JEDEC 命令或 timing 的权威实现</strong>，也不应用于真实 DRAM 功能判断。每次讲解时都要把“教学协议约定”和“真实规范结论”分开写。</p>
+<p>读参考项目的目标，是看懂大型代码如何组织，以及练习追踪事件与 coverage；独立实现的目标，则是你能从权威需求出发，解释每个字段、状态更新、边界条件、报告和 coverage bin 为什么存在。最终面试时，展示你能说清楚需求依据、模型边界、仿真调度和失败定位，比声称“看过一个很大的生成器”更有说服力。</p>
+<hr />
+<p><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">← 返回学习导航</a></p>
+</article><div class="doc-bottom"><a href="/sv-uvm/">← 返回学习目录</a><a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">实验源码 ↗</a></div></main></div><footer>ChenWellesCxy HUST · SV / UVM 学习笔记 <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">查看源码仓库 ↗</a></footer></body></html>

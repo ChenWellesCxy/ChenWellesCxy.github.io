@@ -1,0 +1,47 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lab 03：UVM 简化存储器总线 | ChenWellesCxy HUST</title><meta name="description" content="SV / UVM 学习教程、实验与 CoverageModel 实践。"><link rel="canonical" href="https://chenwellescxy.github.io/sv-uvm/labs/03_uvm/README.html"><link rel="stylesheet" href="/site-shell.css"><link rel="stylesheet" href="/sv-uvm/style.css"></head><body><a class="skip" href="#content">跳到内容</a><header class="cw-site-header"><div class="cw-bar"><a class="cw-brand" href="/">ChenWellesCxy <span>HUST</span></a><nav class="cw-links" aria-label="网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><details class="cw-mobile"><summary>导航</summary><nav aria-label="手机网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></details></div></header><div class="reader"><aside><a class="back" href="/sv-uvm/">← SV / UVM 学习目录</a><details open><summary>本页章节</summary><nav aria-label="本页章节"><a href="#总线约定">总线约定</a><a href="#文件">文件</a><a href="#运行">运行</a><a href="#学习顺序">学习顺序</a><a href="#verilator--accellera-uvm-运行入口">Verilator + Accellera UVM 运行入口</a></nav></details><details><summary>其他文档</summary><nav aria-label="专题文档"><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a><a href="/sv-uvm/docs/SV%E6%95%99%E7%A8%8B.html">从 Pattern 到 SystemVerilog</a><a href="/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html">UVM 入门教程</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html">SV 语言基础详解</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">SV 验证主题详解</a><a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html">UVM 官方资料详解</a><a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html">独立实现 CoverageModel</a><a href="/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html">参考项目精读</a><a href="/sv-uvm/labs/03_uvm/README.html" aria-current="page">UVM 简化存储器实验</a><a href="/sv-uvm/docs/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5.html">开源项目实践</a><a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html">免费 SV/UVM 环境选型</a><a href="/sv-uvm/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.html">环境与验证记录</a><a href="/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html">学习资源调研</a></nav></details></aside><main id="content"><div class="doc-top"><div class="eyebrow">SV / UVM · 动手实践</div><h1>Lab 03：UVM 简化存储器总线</h1><div class="source">项目文档快照 · 2026-10-21 · <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning/blob/f09cfdaf87f25dce129bcc9a6b7c7824387e9d4b/labs/03_uvm/README.md">查看原文 ↗</a></div></div><article><p>本实验从 transaction 到 test 组成一个最小 UVM 环境：sequence/sequencer、driver、monitor、scoreboard、agent、env 与 test。它用来练习 UVM 数据流，协议刻意简化，<strong>不代表 DRAM/JEDEC 协议</strong>。</p>
+<h2 id="总线约定">总线约定</h2>
+<ul>
+<li>8 位 byte 地址；每个 word 4 bytes；只接受 <code>addr[1:0] == 0</code>，索引是 <code>addr &gt;&gt; 2</code>。</li>
+<li>DUT 有 64 个 word，对应 byte 地址 <code>0x00</code> 到 <code>0xFC</code>。</li>
+<li>最多一笔未完成事务。<code>ready = req &amp;&amp; rst_n</code>，因此无等待周期。</li>
+<li>driver 在下降沿改变请求；driver 与 monitor 在上升沿观察握手；读数据组合输出。</li>
+<li>仿真时钟周期 10 ns。复位不清空存储内容。</li>
+</ul>
+<h2 id="文件">文件</h2>
+<ul>
+<li><code>mem_if.sv</code>：教学总线 interface。</li>
+<li><code>mem_dut.sv</code>：教学存储器 DUT；<code>+INJECT_ERROR</code> 会让读数据 bit 0 翻转。</li>
+<li><code>mem_pkg.sv</code>：UVM transaction、directed + constrained-random sequence、driver、monitor、scoreboard、agent、env、test。</li>
+<li><code>tb.sv</code>：时钟、复位、virtual interface 配置、run_test 和全局 watchdog。</li>
+<li><code>run_questa.sh</code>：使用既有 Questa 与 UVM 源码编译和运行。</li>
+</ul>
+<h2 id="运行">运行</h2>
+<p>需要已安装且可用的 Questa，并准备与它兼容的 Accellera UVM 源码目录。<code>UVM_HOME</code> 指向包含 <code>uvm_pkg.sv</code> 和 <code>uvm_macros.svh</code> 的 <code>src</code> 目录，<code>QUESTA_HOME</code> 指向 Questa 安装根目录。例如在 WSL bash 中：</p>
+<pre><code class="language-bash">export QUESTA_HOME=/path/to/questa
+export UVM_HOME=/path/to/uvm/src
+cd &quot;/path/to/SV&amp;UVM Learning/labs/03_uvm&quot;
+bash run_questa.sh
+</code></pre>
+<p>正常流必须精确完成 9 次读检查与 9 次写，并以零 UVM_ERROR/FATAL 结束。故障注入应使 9 次读都产生 mismatch，脚本验证 <code>[EXPECTED_FAULT]</code> 标记和 UVM_ERROR 数量后以退出码 1 结束，表示 DUT 故意注入的错误已被 checker 捕获：</p>
+<pre><code class="language-bash">bash run_questa.sh fault
+</code></pre>
+<p>故障模式预期在 UVM log 中出现 9 条 <code>[SB_MISMATCH]</code>；这是故意注入的错误。全局 watchdog 防止 sequence 或握手停滞，test 会检查读写与比较次数。仿真 transcript 保存在 <code>work/questa_normal.log</code> 或 <code>work/questa_fault.log</code>。脚本使用 UVM 标准类与 Questa 常规命令，尚未在商业仿真器上验证，运行结果须以你的 Questa/UVM 安装为准。</p>
+<h2 id="学习顺序">学习顺序</h2>
+<ol>
+<li>从 <code>mem_sequence.body()</code> 找出两笔 directed 操作，再定位后续随机读写对。</li>
+<li>沿 <code>start_item/finish_item</code>、<code>seq_item_port</code>、接口握手追踪一笔操作。</li>
+<li>对照 monitor 的 analysis port 连接，追到 scoreboard 的 <code>write()</code>。</li>
+<li>修改 DUT 故障注入方式或地址，观察 scoreboard 如何检测错误。</li>
+<li>将 <code>repeat (8)</code> 改为更多轮次，记录 transaction 数和 scoreboard 检查数。</li>
+</ol>
+<p>验收时能讲清：sequence 产生什么、driver 如何握手、monitor 如何重建实际事务、scoreboard 如何建立期望，以及错误注入如何证明 checker 会失败。</p>
+<h2 id="verilator--accellera-uvm-运行入口">Verilator + Accellera UVM 运行入口</h2>
+<p>当前 WSL 已实测 Verilator 5.052 与 Accellera UVM 2020.3.1。优先使用：</p>
+<pre><code class="language-bash">cd &quot;/mnt/d/cxy/SV&amp;UVM Learning/labs/03_uvm&quot;
+bash run_verilator.sh normal
+bash run_verilator.sh fault
+</code></pre>
+<p>脚本会自动使用 <code>UVM_HOME</code>，并把生成目录放在无空格的 <code>/tmp</code> 路径。正常用例要求 <code>UVM_ERROR=0/UVM_FATAL=0</code>；fault 用例要求 scoreboard 捕获 9 次 mismatch。运行后可用 <code>gtkwave build_wave.vcd</code> 查看真实 VCD 波形。</p>
+<hr />
+<p><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">← 返回学习导航</a></p>
+</article><div class="doc-bottom"><a href="/sv-uvm/">← 返回学习目录</a><a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">实验源码 ↗</a></div></main></div><footer>ChenWellesCxy HUST · SV / UVM 学习笔记 <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">查看源码仓库 ↗</a></footer></body></html>

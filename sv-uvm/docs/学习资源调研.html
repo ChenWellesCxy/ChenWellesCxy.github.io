@@ -1,0 +1,143 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SystemVerilog / UVM 学习资源调研 | ChenWellesCxy HUST</title><meta name="description" content="SV / UVM 学习教程、实验与 CoverageModel 实践。"><link rel="canonical" href="https://chenwellescxy.github.io/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html"><link rel="stylesheet" href="/site-shell.css"><link rel="stylesheet" href="/sv-uvm/style.css"></head><body><a class="skip" href="#content">跳到内容</a><header class="cw-site-header"><div class="cw-bar"><a class="cw-brand" href="/">ChenWellesCxy <span>HUST</span></a><nav class="cw-links" aria-label="网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><details class="cw-mobile"><summary>导航</summary><nav aria-label="手机网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></details></div></header><div class="reader"><aside><a class="back" href="/sv-uvm/">← SV / UVM 学习目录</a><details open><summary>本页章节</summary><nav aria-label="本页章节"><a href="#建议学习顺序">建议学习顺序</a><a href="#标准与官方资料">标准与官方资料</a><a href="#可运行项目与工具">可运行项目与工具</a><a href="#仿真器与波形的实际选择">仿真器与波形的实际选择</a><a href="#固定版本复现与许可证建议">固定版本、复现与许可证建议</a><a href="#适合先做的练习">适合先做的练习</a></nav></details><details><summary>其他文档</summary><nav aria-label="专题文档"><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a><a href="/sv-uvm/docs/SV%E6%95%99%E7%A8%8B.html">从 Pattern 到 SystemVerilog</a><a href="/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html">UVM 入门教程</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html">SV 语言基础详解</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">SV 验证主题详解</a><a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html">UVM 官方资料详解</a><a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html">独立实现 CoverageModel</a><a href="/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html">参考项目精读</a><a href="/sv-uvm/labs/03_uvm/README.html">UVM 简化存储器实验</a><a href="/sv-uvm/docs/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5.html">开源项目实践</a><a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html">免费 SV/UVM 环境选型</a><a href="/sv-uvm/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.html">环境与验证记录</a><a href="/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html" aria-current="page">学习资源调研</a></nav></details></aside><main id="content"><div class="doc-top"><div class="eyebrow">SV / UVM · 工具与资料</div><h1>SystemVerilog / UVM 学习资源调研</h1><div class="source">项目文档快照 · 2026-10-21 · <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning/blob/f09cfdaf87f25dce129bcc9a6b7c7824387e9d4b/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.md">查看原文 ↗</a></div></div><article><p><strong>本轮补充：</strong> 深入教材入口是 <a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a>。免费UVM环境以 <a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html">更新后的选型</a> 为准：Verilator 5.052明确支持UVM 2020-3.2，DSim官方列出可生成的Free Individual License，EDA Playground提供免费在线商业工具。不要把本机旧版5.032的限制外推为当前所有开源工具的限制。</p>
+<p>调研日期：2026-10-09。以下资源优先采用标准组织、工具官方文档和项目上游仓库。适合你的目标是先补足“能独立写自检式 SV testbench”的能力，再把同一套验证思想映射到 UVM；DRAM/Finesim 的经验可以作为协议、时序约束、corner case 和回归管理的优势。</p>
+<h2 id="建议学习顺序">建议学习顺序</h2>
+<ol>
+<li><strong>SystemVerilog 语法与仿真基础</strong>：IEEE 1800 标准作查阅手册；配合 SystemVerilog Academy 或 Siemens Verification Academy 的课程，先学 <code>logic</code>、过程块、数组、task/function、interface、clocking block、class、继承和 virtual method。</li>
+<li><strong>验证语言能力</strong>：练 transaction/class、queue/associative array、mailbox/event、<code>fork...join</code>、约束随机化、立即断言/并发断言、covergroup、functional coverage。每一章都写一个小的自检 TB，产生 VCD/FST 波形。</li>
+<li><strong>用开源工具做纯 SV 练习</strong>：从 systemverilog-homework 开始；再用 Verilator manual 的 <code>--binary</code> 示例及自己的小 DUT/自检 TB。Verilator 和 Icarus 都有语言/验证特性边界，遇到不支持的构造要区分“代码错”和“工具不支持”。</li>
+<li><strong>再学 UVM</strong>：先看 Doulos Easier UVM 和 Accellera 的入门视频，按 <code>sequence_item → sequence/sequencer/driver → monitor → agent → env → scoreboard → test</code> 顺序构建 TinyALU 或 FIFO 验证环境。后读 UVM User’s Guide，再查 Class Reference 和源码。不要一开始就读全套类库源码。</li>
+<li><strong>接触真实规模代码</strong>：读 Ibex 的 UVM 验证文档与源码，重点看 test/sequence、agent、scoreboard、coverage、testplan 如何对应；其完整 UVM 回归需要商业仿真器及若干依赖，建议作为阅读材料，不作为第一套必须跑通的练习。</li>
+<li><strong>迁移到 DRAM 验证岗位面试</strong>：把已有的命令/时序场景改写成 transaction 与 sequence；解释 stimulus、monitor、reference model/scoreboard、coverage、assertion、seed/reproducibility、debug waveform。UVM 是组织方式，不替代协议知识。</li>
+</ol>
+<h2 id="标准与官方资料">标准与官方资料</h2>
+<table>
+<thead>
+<tr>
+<th>资源</th>
+<th>用途与备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://standards.ieee.org/ieee/1800/7743/">IEEE 1800-2023 SystemVerilog 标准页</a></td>
+<td>语言权威标准；页面说明可通过 IEEE Get Program 免费获取 PDF。不要把标准当入门教程，按主题查阅。</td>
+</tr>
+<tr>
+<td><a href="https://www.accellera.org/downloads/standards/uvm">Accellera UVM 下载页</a></td>
+<td>官方参考实现与历史版本下载。目前页面列出 UVM 2020-3.2 (2026-08) 及 2020-3.1；学习时固定一种版本。</td>
+</tr>
+<tr>
+<td><a href="https://www.accellera.org/community/uvm">Accellera UVM 社区页</a></td>
+<td>IEEE 1800.2-2020 对应 UVM 参考实现与社区入口。</td>
+</tr>
+<tr>
+<td><a href="https://www.accellera.org/images/downloads/standards/uvm/uvm_users_guide_1.2.pdf">Accellera UVM 1.2 User’s Guide PDF</a></td>
+<td>经典逐步入门材料，适合理解架构；版本较旧，读法与现代项目 API 有差异时以项目所用版本/标准为准。PDF 版权页许可该材料采用 Apache 2.0。</td>
+</tr>
+<tr>
+<td><a href="https://verificationacademy.com/verification-methodology-reference/uvm/docs_1.1d/html/">UVM Class Reference（Verification Academy 镜像文档）</a></td>
+<td>API 查询和继承关系参考；这是 UVM 1.1d 文档，不要误当最新标准。</td>
+</tr>
+<tr>
+<td><a href="https://www.accellera.org/news/press-releases/320-uvm-reference-implementation-aligned-with-ieee-1800-2-2020-standard">Accellera：UVM IEEE 1800.2-2020 对齐说明</a></td>
+<td>理解 UVM 1.2 与 IEEE 1800.2 版本关系。</td>
+</tr>
+<tr>
+<td><a href="https://www.vhdl.org/resources/videos/uvm-tutorial-2012">Accellera UVM tutorial: Ready, Set, Deploy!</a></td>
+<td>官方活动页面上的入门视频/教程，覆盖受约束随机验证及 UVM 基础。</td>
+</tr>
+<tr>
+<td><a href="https://accellera.org/images/resources/videos/Tutorial-IEEE-1800-2-Standard-for-UVM-2019.pdf">Accellera IEEE 1800.2 标准教程 PDF</a></td>
+<td>了解 IEEE UVM 标准化过程和结构，属于概览资料。</td>
+</tr>
+<tr>
+<td><a href="https://verificationacademy.com/all-content/?content_type=Lesson">Siemens Verification Academy 全部课程</a></td>
+<td>可按 SystemVerilog、Classes、Constraint Solver、UVM 分类学习；也可找 UVM Cookbook 等课程内容。</td>
+</tr>
+<tr>
+<td><a href="https://www.doulos.com/easier">Doulos Easier UVM</a></td>
+<td>面向可读、可维护 UVM 的免费指南，适合作为第一套 UVM 编码风格参考。</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=imH4CFmVGWE">Doulos UVM 入门视频</a></td>
+<td>约 2011 年的概念介绍，年代较早但适合先建立 UVM 组件图景。</td>
+</tr>
+<tr>
+<td><a href="https://www.systemverilogacademy.com/">SystemVerilog Academy</a></td>
+<td>当前课程目录含 SV、SVA、约束和 UVM 初学者/agent 课程；网站说明旧课程可免费观看。可作通俗课程，标准和上游工具文档用于核对。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="可运行项目与工具">可运行项目与工具</h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>推荐用法、运行条件与限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/yuri-panchul/systemverilog-homework">SystemVerilog Homework</a></td>
+<td><strong>首选练习项目</strong>。上游 README 提供 Linux/WSL 脚本，包含自检练习，并能通过 <code>$dumpvars</code> 生成 VCD 用 GTKWave/Surfer 看波形。README 标示 MIT License。运行前记录仓库 commit；不要默认最新主分支永远稳定。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/verilator/verilator">Verilator 官方仓库</a> 与 <a href="https://verilator.org/guide/latest/example_binary.html">官方 <code>--binary</code> 示例</a></td>
+<td>开源 SV 仿真/ lint 工具，支持范围持续变化。官方示例展示如何直接编译运行 SV 示例；可加 <code>--trace</code> 生成波形（具体选项按当前手册）。许可证为 LGPL-3.0 或 Artistic License 2.0。完整 UVM 兼容性不能假定；核对所选 Verilator 版本的支持清单。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/steveicarus/iverilog">Icarus Verilog</a></td>
+<td>轻量、适合基础 RTL 与部分 SV 语法/测试平台练习；不适合用来证明完整 class/constraint/UVM 兼容。项目许可证 GPL-2.0-or-later。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dpretet/svut">SVUT</a></td>
+<td>小型 Verilog/SystemVerilog 单元测试框架，README 描述 Icarus/Verilator 与 VCD/GTKWave 工作流；适合模块级测试。先检查该项目当前支持的语言子集和许可证文件。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/adibis/brokenBench">brokenBench</a></td>
+<td>SV/UVM gotcha 风格练习，偏“观察和修复边界行为”；仓库说明部分练习可能要求特定/打补丁 Verilator，按每个练习标签确认，不要把其所有 UVM 练习都当作 stock 工具可跑。检查 LICENSE 与固定 commit。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/antmicro/verilator-uvm-example/tree/e2c9b49ab9a99298190dd1fb580bd59e2c0a7dd8">Antmicro verilator-uvm-example</a></td>
+<td><strong>推荐作为 UVM 实践补充</strong>：该固定版本提供 item、sequence、sequencer、driver、monitor、scoreboard 与 test 的小型 SV UVM 环境；README 给出 Verilator 编译运行命令，并固定示例所用 Accellera UVM 2020.3.1。仓库采用 Apache-2.0。注意这是 Verilator 当前支持子集上的演示，不能据此推断任意 UVM 工程可运行；复现时按此 commit、其所需 Verilator 版本及 UVM 2020.3.1记录环境。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/VerificationXpert/opensource-uvm">VerificationXpert opensource-uvm</a></td>
+<td>有 Verilator + UVM 的实验性 minimal example，仓库称 MIT；属于探索/实验项目，依赖与 UVM 子集可能随版本变化，作为进阶尝试，不作为基准答案。先固定仓库 commit、Verilator 版本和 UVM 源码版本。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/pyuvm/pyuvm">pyuvm TinyALU</a></td>
+<td>可在开源模拟器上体验 UVM 概念的 Python/cocotb 实现，并有 TinyALU 示例；它<strong>不是 SystemVerilog UVM</strong>，适合旁观 transaction/sequence/scoreboard 结构，不足以替代 SV UVM 编码练习。查仓库 LICENSE 和支持的 simulator 版本。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/lowRISC/ibex/blob/master/doc/03_reference/verification.rst">lowRISC Ibex 验证文档</a></td>
+<td>高质量真实 UVM 环境案例。上游文档说明完整 co-simulation 需支持 UVM 的仿真器，当前验证的完整 flow 使用 VCS/Xcelium，并需 Spike/RISC-V 工具链；Ibex Simple System 另有 Verilator 仿真目标，但那不等价于运行完整 UVM 回归。代码仓库 Apache-2.0，依赖各自许可证需单独检查。</td>
+</tr>
+<tr>
+<td><a href="https://www.accellera.org/downloads/standards/uvm">Accellera UVM Reference Implementation</a></td>
+<td>与所选 UVM 标准版本配套的库源码。开源库本身不等于开源仿真器能完整运行 UVM；建议在有许可的 Questa/VCS/Xcelium/Riviera/DSim 等工具上完成正式 SV UVM 练习。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="仿真器与波形的实际选择">仿真器与波形的实际选择</h2>
+<ul>
+<li><strong>纯 SV 入门</strong>：在 WSL 用 Verilator 或 Icarus 做简单 module、task、过程块、interface 等练习。较高级随机化、covergroup、SVA、UVM 的支持情况依工具版本/构造而变，不能以“编译通过几个例子”推断完整兼容。</li>
+<li><strong>标准 SV UVM</strong>：使用带 UVM 支持的商用工具/教育版，或 EDA Playground 这类在线环境（需检查当时可用 simulator、运行时长及账号要求）。本地安装 Verilator 并不自动提供完整 UVM 模拟能力。DSim 也可作为可访问的商业/免费额度选项，但额度、许可和版本会变化，应以其官网当前政策为准。</li>
+<li><strong>波形</strong>：优先让小练习输出 VCD/FST，使用 GTKWave/Surfer 查看时钟、复位、valid/ready、transaction 边界和 checker 采样点。UVM 类层次对象不一定直接映射成硬件波形；通过接口信号、打印日志、transaction recording 和仿真器的 UVM debug 能力联合定位。</li>
+</ul>
+<h2 id="固定版本复现与许可证建议">固定版本、复现与许可证建议</h2>
+<ol>
+<li>每次学习工程把工具版本写在 <code>README</code>：OS/WSL 版本、Verilator/Icarus 版本、UVM 版本、波形查看器版本；命令行保存到脚本或 Makefile。</li>
+<li>Git 项目 clone 后记录 <code>git rev-parse HEAD</code>，把上游分支/标签与 commit SHA 存入学习笔记；依赖不要长期追踪 <code>master</code>。学习 UVM 时建议明确写 <code>IEEE 1800.2-2020 / Accellera UVM 2020-3.2</code>，若工具随附的是另一版本则记录实际版本，不混用库文件。</li>
+<li>代码仓库 license 与 UVM 标准/文档 license 是不同事项。分发或公开自己的 fork 前检查每个 repo 的 <code>LICENSE</code>、第三方依赖和波形/示例版权；上表许可证信息来自项目首页/README 中明确说明的条目，未明确列出的应在使用前核对。</li>
+<li>本调研没有读取或复制你的私人 RefProject。后续 SV 教程会按你指定的 CoverageModel 路径分析其结构，但只抽取适合教学的概念与自建练习，避免把专有材料上传到公开仓库。</li>
+</ol>
+<h2 id="适合先做的练习">适合先做的练习</h2>
+<ul>
+<li>写一个 8-bit counter/FIFO 的 SV 自检 testbench：driver 产生操作，monitor 采样接口，scoreboard 用队列预测，assertion 检查不变量，covergroup 覆盖边界；输出波形并写清楚采样点。</li>
+<li>将 driver 的操作封装成 <code>sequence_item</code> 和 <code>sequence</code>，增加 sequencer/agent，再加入 passive monitor 和 scoreboard，比较模块化前后的复用方式。</li>
+<li>选择一个与工作无关的公开 DUT（如简单 ALU/FIFO），完整做 directed + constrained-random 测试，保存 seed、日志、波形和 coverage 结果；之后把 DRAM 场景抽象为“命令 transaction 与约束”，练习面试讲解。</li>
+</ul>
+<hr />
+<p><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">← 返回学习导航</a></p>
+</article><div class="doc-bottom"><a href="/sv-uvm/">← 返回学习目录</a><a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">实验源码 ↗</a></div></main></div><footer>ChenWellesCxy HUST · SV / UVM 学习笔记 <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">查看源码仓库 ↗</a></footer></body></html>

@@ -1,0 +1,484 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UVM 入门与 DRAM 验证工程师转型练习 | ChenWellesCxy HUST</title><meta name="description" content="SV / UVM 学习教程、实验与 CoverageModel 实践。"><link rel="canonical" href="https://chenwellescxy.github.io/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html"><link rel="stylesheet" href="/site-shell.css"><link rel="stylesheet" href="/sv-uvm/style.css"></head><body><a class="skip" href="#content">跳到内容</a><header class="cw-site-header"><div class="cw-bar"><a class="cw-brand" href="/">ChenWellesCxy <span>HUST</span></a><nav class="cw-links" aria-label="网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><details class="cw-mobile"><summary>导航</summary><nav aria-label="手机网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></details></div></header><div class="reader"><aside><a class="back" href="/sv-uvm/">← SV / UVM 学习目录</a><details open><summary>本页章节</summary><nav aria-label="本页章节"><a href="#怎么学习">怎么学习</a><a href="#1-把熟悉的-finesim-工作映射到-uvm">1. 把熟悉的 FineSim 工作映射到 UVM</a><a href="#2-建立一个教学总线模型">2. 建立一个教学总线模型</a><a href="#3-transaction把一笔总线操作装进对象">3. Transaction：把一笔总线操作装进对象</a><a href="#4-sequence-与-sequencer描述和仲裁请求">4. Sequence 与 Sequencer：描述和仲裁请求</a><a href="#5-driver把-item-转成引脚动作">5. Driver：把 item 转成引脚动作</a><a href="#6-monitor从-pin-level-还原事务">6. Monitor：从 pin-level 还原事务</a><a href="#7-scoreboard-与-reference-model检查可观察结果">7. Scoreboard 与 Reference Model：检查可观察结果</a><a href="#8-agentenv-与-test把组件组织成可复用结构">8. Agent、Env 与 Test：把组件组织成可复用结构</a><a href="#9-phases-与-objection仿真何时开始和结束">9. Phases 与 Objection：仿真何时开始和结束</a><a href="#10-factory允许替换组件而不改环境源码">10. Factory：允许替换组件而不改环境源码</a><a href="#11-config-db-与-virtual-interface把连接配置传到组件">11. Config DB 与 Virtual Interface：把连接配置传到组件</a><a href="#12-tlm-与-analysis-port组件间传数据">12. TLM 与 Analysis Port：组件间传数据</a><a href="#13-functional-coverage知道测到了哪些场景">13. Functional Coverage：知道测到了哪些场景</a><a href="#14-regression从单场景到可重复验证">14. Regression：从单场景到可重复验证</a><a href="#15-ral寄存器抽象层的用途与边界">15. RAL：寄存器抽象层的用途与边界</a><a href="#16-建议的开源阅读路线">16. 建议的开源阅读路线</a><a href="#17-完整学习路线与验收标准">17. 完整学习路线与验收标准</a><a href="#18-面试准备把现有经验讲成可迁移能力">18. 面试准备：把现有经验讲成可迁移能力</a><a href="#参考资料">参考资料</a><a href="#8-在已安装环境中运行完整-uvm-实战">8. 在已安装环境中运行完整 UVM 实战</a><a href="#9-verilator-与商业仿真器的边界">9. Verilator 与商业仿真器的边界</a></nav></details><details><summary>其他文档</summary><nav aria-label="专题文档"><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a><a href="/sv-uvm/docs/SV%E6%95%99%E7%A8%8B.html">从 Pattern 到 SystemVerilog</a><a href="/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html" aria-current="page">UVM 入门教程</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html">SV 语言基础详解</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">SV 验证主题详解</a><a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html">UVM 官方资料详解</a><a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html">独立实现 CoverageModel</a><a href="/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html">参考项目精读</a><a href="/sv-uvm/labs/03_uvm/README.html">UVM 简化存储器实验</a><a href="/sv-uvm/docs/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5.html">开源项目实践</a><a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html">免费 SV/UVM 环境选型</a><a href="/sv-uvm/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.html">环境与验证记录</a><a href="/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html">学习资源调研</a></nav></details></aside><main id="content"><div class="doc-top"><div class="eyebrow">SV / UVM · 入门教程</div><h1>UVM 入门与 DRAM 验证工程师转型练习</h1><div class="source">项目文档快照 · 2026-10-21 · <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning/blob/f09cfdaf87f25dce129bcc9a6b7c7824387e9d4b/docs/UVM%E6%95%99%E7%A8%8B.md">查看原文 ↗</a></div></div><article><p>这是入门篇。完整的分主题解释见 <a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html">UVM官方文档详解</a>，官方资料与中文内容的对应关系见 <a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">学习导航</a>。免费工具的最新选型见 <a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html">UVM免费环境选型</a>：Verilator 5.052已官方声明支持UVM 2020-3.2；本机5.032和本实验尚未验证的状态仍保持不变。</p>
+<p>这份教程面向有约两年 DRAM FineSim fullchip 验证经验、熟悉 pattern/sequence 思维，但较少编写 SystemVerilog、没有 UVM 项目经历的工程师。目标不是背类名，而是能解释一个 transaction 从测试用例走到引脚、再从监视器回到 scoreboard 的完整路径，并能自己读懂和扩展小型 UVM 环境。</p>
+<p>本文使用一个<strong>教学用简化存储器总线</strong>：请求包含读写、地址和数据，按握手边沿接收操作。配套实验03是零等待版本；后续练习可以扩展为若干拍后完成。它只用于练习验证架构，不代表任何 DRAM 协议，也不表达 JEDEC 时序约束。真实 DRAM 的 ACT/RD/WR/PRE、bank/row、刷新、训练和时序检查，应由对应项目规范与模型定义。</p>
+<h2 id="怎么学习">怎么学习</h2>
+<p>按下面顺序推进，每节都要求动手。主工作区另有配套的可运行 SV 小实验时，先用那些实验练语法，再回到这里看 UVM 结构。UVM 教程片段用于解释概念，均为<strong>教学片段，不是完整可编译程序</strong>；UVM 的类库、接口、package、顶层、编译顺序和 simulator 选项都必须齐全。你当前 WSL 有 Verilator 5.032 与 Icarus 12，但这不代表本机已经具备或成功运行 UVM：Verilator 版本能力受版本、UVM 版本、所用特性和配置影响；Icarus 不能作为完整 UVM 平台。先把以下开源例程当作源码阅读材料，运行时严格按其 README 的依赖和版本说明确认。</p>
+<p>按知识依赖顺序学习：先理解总线握手，再学习 transaction 与 sequence，然后 driver/monitor/scoreboard，最后学习组件组织、UVM 生命周期、配置、覆盖率与 RAL。每节先手写关键代码、画出数据流，再尝试口头解释；配套原创实验位于 <code>labs/03_uvm/</code>。</p>
+<h2 id="1-把熟悉的-finesim-工作映射到-uvm">1. 把熟悉的 FineSim 工作映射到 UVM</h2>
+<p>FineSim pattern 通常描述“做什么操作、按什么顺序、观察什么结果”；UVM 把这类意图拆成可复用对象，并明确驱动与观察职责。</p>
+<table>
+<thead>
+<tr>
+<th>你熟悉的工作概念</th>
+<th>UVM 里常见对应</th>
+<th>要点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pattern/操作描述</td>
+<td>sequence item / transaction</td>
+<td>一笔可描述、可随机化、可比较的操作</td>
+</tr>
+<tr>
+<td>pattern sequence</td>
+<td>sequence</td>
+<td>产生一笔或多笔 transaction，表达场景</td>
+</tr>
+<tr>
+<td>向 DUT/TB 发送操作</td>
+<td>sequencer 与 driver</td>
+<td>sequencer 仲裁 item；driver 将 item 转为 pin-level 信号</td>
+</tr>
+<tr>
+<td>波形或接口采样</td>
+<td>monitor</td>
+<td>从接口观察真实发生的传输，重建 transaction</td>
+</tr>
+<tr>
+<td>期望值/数据比对</td>
+<td>scoreboard/reference model</td>
+<td>根据已观察输入预测结果并比较输出</td>
+</tr>
+<tr>
+<td>可复用测试环境</td>
+<td>agent/env</td>
+<td>封装驱动端、观察端与检查组件</td>
+</tr>
+<tr>
+<td>仿真批次与用例</td>
+<td>test + phases</td>
+<td>选择组件配置、启动场景、控制结束</td>
+</tr>
+</tbody>
+</table>
+<p>核心数据路径：</p>
+<pre><code class="language-text">test ──启动 sequence──&gt; sequencer ──item──&gt; driver ──引脚──&gt; DUT
+                                                   DUT ──引脚──&gt; monitor
+scoreboard &lt;──analysis transaction── monitor
+</code></pre>
+<p>一个关键思维变化：driver 负责“把请求送出去”，monitor 负责“报告接口上实际发生的事”。scoreboard 应尽量依据 monitor 观察到的事务来检查，而不是直接相信 sequence 声称自己发了什么。这样才能检查 driver、接口握手与 DUT 的组合行为。</p>
+<h2 id="2-建立一个教学总线模型">2. 建立一个教学总线模型</h2>
+<p>练习接口定义如下：</p>
+<pre><code class="language-systemverilog">// 教学片段：说明信号，不是完整 testbench
+interface mem_bus_if(input logic clk);
+  logic rst_n;
+  logic req, write;
+  logic [7:0] addr;
+  logic [31:0] wdata;
+  logic ready;
+  logic [31:0] rdata;
+  // 实际工程可用 clocking block 分开驱动/采样时序
+endinterface
+</code></pre>
+<p>约定：master 在 <code>req=1</code> 时保持 <code>write/addr/wdata</code> 稳定；slave 在某个上升沿令 <code>ready=1</code> 表示完成；读事务在完成时采样 <code>rdata</code>。本练习设计最多有一笔 outstanding 请求，地址是 8 位 byte 地址，word 为 4 bytes，地址必须按 word 对齐，故有效地址为 0、4、…、252，对应 64 个 words。数组索引为 <code>addr &gt;&gt; 2</code>。协议规则必须写清楚，因为 driver、monitor、DUT、scoreboard 全都依赖同一份约定。</p>
+<p>练习 1：先不用 UVM，用普通 SV 写一个最小 DUT 和 testbench：复位后写地址 8 的数据 <code>32'h1234_5678</code>，再读回并比较。画出 req、ready、addr、wdata、rdata 的时序。写出“完成”的精确定义：不是 req 拉高就完成，而是双方在有效时钟沿看到 req 与 ready 同时为 1。</p>
+<p>参考时序（信号为示意，假设请求在第三个上升沿握手）：</p>
+<pre><code class="language-text">上升沿       1       2       3       4       5
+req          0       1       1       0       0
+ready        0       0       1       0       0
+addr       --      08      08      --      --
+wdata      --    1234    1234      --      --
+握手         .       .       X       .       .
+</code></pre>
+<p>验收：你能指出哪一个边沿算一次传输，req/ready 若一直保持高会不会被错误地计成多笔，以及 reset 期间 monitor 是否应发布事务。</p>
+<h2 id="3-transaction把一笔总线操作装进对象">3. Transaction：把一笔总线操作装进对象</h2>
+<p><code>uvm_sequence_item</code> 是供 sequence 与 driver 交换的请求对象。它不是信号本身；它表示“做一笔什么操作”。对象通常用 <code>rand</code> 字段配合约束生成合法组合。</p>
+<pre><code class="language-systemverilog">// 教学片段：非完整可运行程序
+class mem_item extends uvm_sequence_item;
+  rand bit          write;
+  rand bit [7:0]    addr;
+  rand bit [31:0]   data;
+       bit [31:0]   rdata; // 读回观察值，通常由 monitor 填入
+
+  constraint aligned_addr_c { addr[1:0] == 0; }
+
+  `uvm_object_utils_begin(mem_item)
+    `uvm_field_int(write, UVM_DEFAULT)
+    `uvm_field_int(addr,  UVM_DEFAULT)
+    `uvm_field_int(data,  UVM_DEFAULT)
+    `uvm_field_int(rdata, UVM_DEFAULT)
+  `uvm_object_utils_end
+
+  function new(string name=&quot;mem_item&quot;); super.new(name); endfunction
+endclass
+</code></pre>
+<p>学习重点：<code>rand</code> 是随机化资格，不等于每次自动随机；调用 <code>randomize()</code> 才会生成值。约束表达合法空间，比如对齐、地址范围、读写比例（后续可用 sequence 控制）。<code>data</code> 同时用作写入数据和读请求的无关字段，工程中可以把输入字段、响应字段命名得更清晰。</p>
+<h3 id="clonecopy-与对象句柄">clone/copy 与对象句柄</h3>
+<p>SystemVerilog class 变量保存对象句柄。若 monitor 每次都把同一个对象句柄发给 analysis port，subscriber 可能在稍后看到对象已被下一笔传输覆盖。常见做法是每笔采样建立新对象，或发出副本。对象字段将来若包含动态数组、队列、嵌套 class，就要考虑深拷贝；浅拷贝只复制句柄。</p>
+<pre><code class="language-systemverilog">// 教学片段
+mem_item snapshot;
+if (!$cast(snapshot, observed.clone())) `uvm_fatal(&quot;CLONE&quot;, &quot;clone failed&quot;)
+ap.write(snapshot);
+</code></pre>
+<p>验收：解释 <code>mem_item a, b; b = a;</code> 为什么通常不是复制对象；列出本 transaction 哪些字段由 sequence 产生、哪些由 monitor 观察。</p>
+<h2 id="4-sequence-与-sequencer描述和仲裁请求">4. Sequence 与 Sequencer：描述和仲裁请求</h2>
+<p>sequence 负责产生 item 与场景语义；sequencer 负责在一个或多个 sequence 同时请求时仲裁 item。多数初学练习只有一个 sequence，因此容易误以为 sequencer 是“产生随机数据的地方”。实际职责要分开：item 描述单笔操作，sequence 决定操作组合，sequencer 提供 item 通道与仲裁。</p>
+<pre><code class="language-systemverilog">// 教学片段：非完整可运行程序
+class write_read_seq extends uvm_sequence #(mem_item);
+  `uvm_object_utils(write_read_seq)
+  function new(string name=&quot;write_read_seq&quot;); super.new(name); endfunction
+
+  task body();
+    mem_item req;
+    req = mem_item::type_id::create(&quot;req&quot;);
+    start_item(req);
+    if (!req.randomize() with { write == 1; addr == 8'h08; data == 32'h1234_5678; })
+      `uvm_fatal(&quot;RAND&quot;, &quot;write randomization failed&quot;)
+    finish_item(req);
+    // 第二笔读：教学代码省略完整响应采集细节
+  endtask
+endclass
+</code></pre>
+<p>标准握手写法是 <code>start_item(req)</code> → 填字段/随机化 → <code>finish_item(req)</code>。调用 <code>finish_item</code> 后，sequence 等待 driver 完成本次 item。真实项目会处理 response、ID、多 outstanding 和 sequence 组合；当前教学总线刻意保持简单。</p>
+<p>练习 2：写一个 sequence，先固定地址做 write，再做 read；再写一个循环 sequence 对 4 个地址交替读写。暂时不使用随机化，先确保场景可预测。</p>
+<p>面试表达： “我把一笔 bus 操作建模为 sequence item，sequence 负责场景顺序和约束，sequencer 管理 item 的仲裁，driver 才把 item 转成握手信号。”</p>
+<h2 id="5-driver把-item-转成引脚动作">5. Driver：把 item 转成引脚动作</h2>
+<p>driver 从 sequencer 取 item，按协议驱动 interface，并在握手完成时返回。driver 需要明确复位处理、信号默认值、等待条件、超时与采样边沿。下面是伪代码级片段：</p>
+<pre><code class="language-systemverilog">// 教学片段：省略 virtual interface 获取和完整时钟控制
+task run_phase(uvm_phase phase);
+  mem_item tr;
+  drive_idle();
+  forever begin
+    seq_item_port.get_next_item(tr);
+    @(posedge vif.clk);
+    vif.req   &lt;= 1;
+    vif.write &lt;= tr.write;
+    vif.addr  &lt;= tr.addr;
+    vif.wdata &lt;= tr.data;
+    do @(posedge vif.clk); while (!vif.ready);
+    vif.req &lt;= 0;
+    seq_item_port.item_done();
+  end
+endtask
+</code></pre>
+<p>实际代码要避免 testbench race。可以采用 clocking block 并规定 drive/sample skew，或严格约定在 negedge 驱动、posedge 采样。若 reset 中断事务，要定义 driver 如何结束或丢弃 item。必须加 watchdog，避免 DUT 不回 ready 时仿真永久挂起。</p>
+<p>验收：将 <code>ready</code> 永不拉高，确认你设计的 timeout 会报错；reset 在等待 ready 时拉低，检查 driver 是否回到 idle。</p>
+<h2 id="6-monitor从-pin-level-还原事务">6. Monitor：从 pin-level 还原事务</h2>
+<p>monitor 不从 sequence 取数据，也不驱动 DUT。它观察接口的实际握手，在 <code>req &amp;&amp; ready</code> 的有效采样边沿捕获命令，构造 transaction 并通过 analysis port 广播。</p>
+<pre><code class="language-systemverilog">// 教学片段
+forever begin
+  @(posedge vif.clk);
+  if (vif.rst_n &amp;&amp; vif.req &amp;&amp; vif.ready) begin
+    mem_item tr;
+    tr = mem_item::type_id::create(&quot;tr&quot;);
+    tr.write = vif.write;
+    tr.addr  = vif.addr;
+    tr.data  = vif.wdata;
+    tr.rdata = vif.rdata;
+    ap.write(tr);
+  end
+end
+</code></pre>
+<p>阅读片段时要问：若 ready 在 req 之前先为高，何时算握手？若 monitor 在同一边沿采到旧 rdata，怎么办？这些不是 UVM 特有问题，而是协议与 SV 仿真调度问题。接口 clocking block 和协议定义一起解决采样歧义。</p>
+<p>练习 3：为 monitor 加 <code>uvm_info</code>，每次打印序号、读写、地址、写数据、读数据；用波形确认日志数量与真实握手次数一致。</p>
+<h2 id="7-scoreboard-与-reference-model检查可观察结果">7. Scoreboard 与 Reference Model：检查可观察结果</h2>
+<p>scoreboard 维护一个软件参考存储器。它收到 monitor 发布的实际事务：写时更新模型，读时拿模型期望值与 DUT 返回值比较。模型只能按协议约定建模；若协议存在未初始化内存，则要决定未写地址的读行为是不可预测、受约束还是返回特定值。</p>
+<pre><code class="language-systemverilog">// 教学片段
+bit [31:0] model_mem [0:63];
+bit        initialized [0:63];
+
+function void write(mem_item tr);
+  // 函数内声明的局部变量默认是 automatic 生命周期；每次调用各有自己的 idx。
+  int idx;
+  idx = int'(tr.addr) &gt;&gt; 2; // byte 地址转换成 word 数组索引
+  if (tr.write) begin
+    model_mem[idx] = tr.data;
+    initialized[idx] = 1;
+  end else if (!initialized[idx]) begin
+    `uvm_warning(&quot;SB&quot;, $sformatf(&quot;read from unwritten address %0h&quot;, tr.addr))
+  end else if (tr.rdata !== model_mem[idx]) begin
+    `uvm_error(&quot;SB&quot;, $sformatf(&quot;addr=%0h expected=%08h actual=%08h&quot;, tr.addr, model_mem[idx], tr.rdata))
+  end
+endfunction
+</code></pre>
+<p>上面的 <code>idx</code> 范围还需检查，避免地址越界。读数据何时有效要根据总线协议采样；若响应与请求分离，应定义 request/response transaction 或在 monitor 里配对。</p>
+<p>练习 4：故意把 DUT 写入数据某一位取反，确认 scoreboard 能报告地址、期望值和实际值；修复 DUT 后再跑。加入覆盖计数，确保读写都发生。</p>
+<p>面试表达： “monitor 发布实际观察到的传输，scoreboard 基于这些传输更新参考模型并比较响应，因此检查链路不依赖 sequence 自报结果。”</p>
+<h2 id="8-agentenv-与-test把组件组织成可复用结构">8. Agent、Env 与 Test：把组件组织成可复用结构</h2>
+<p>一个 active agent 通常有 sequencer、driver、monitor；passive agent 只保留 monitor。env 容纳 agent 与 scoreboard，并把 monitor 的 analysis port 接到 scoreboard 的 analysis export/implementation。test 创建 env、设置配置并启动场景。</p>
+<pre><code class="language-text">uvm_test
+└── mem_env
+    ├── mem_agent (active)
+    │   ├── sequencer
+    │   ├── driver ── virtual interface
+    │   └── monitor ── analysis_port ──&gt; scoreboard
+    └── scoreboard
+</code></pre>
+<p>active/passive 的区别很适合映射到 DRAM fullchip 环境：主动端产生刺激；被动端只观察已有总线。一个 DUT 的不同接口可能分别有 active agent 和 passive agent。不要把 monitor 塞进 scoreboard；分开后才能把同一 monitor 接给 scoreboard、coverage collector、日志订阅者等多个消费者。</p>
+<p>练习 5：画出你手头 FineSim fullchip TB 中 stimulus、pattern sequence、DUT pins、checker、波形观察的大致关系。只标职责，不需要暴露公司内部信号或资料。再画一张对应 UVM 的组件图，指出哪些职责相同、哪些通常由 UVM 类承担。</p>
+<h2 id="9-phases-与-objection仿真何时开始和结束">9. Phases 与 Objection：仿真何时开始和结束</h2>
+<p>UVM phases 是框架安排组件构建和运行的阶段。常见顺序包括 build、connect、end_of_elaboration、start_of_simulation、run、extract、check、report、final。build 中创建组件并读取配置；connect 中连接 TLM；run 中驱动时间并执行场景；后处理阶段汇总检查与报告。</p>
+<p><code>run_phase</code> 是 task phase，可以消耗仿真时间。UVM 不知道你的 test 是否已完成，所以用 objection 表示“我仍在进行”。test raise objection，启动 sequence，sequence 返回后 drop objection；所有 objection 清零后 run phase 才能结束。若遗漏 drop，仿真会挂着；若没 raise 或过早 drop，仿真可能在 stimulus 完成前结束。</p>
+<pre><code class="language-systemverilog">// 教学片段
+task run_phase(uvm_phase phase);
+  write_read_seq seq = write_read_seq::type_id::create(&quot;seq&quot;);
+  phase.raise_objection(this, &quot;running basic write/read&quot;);
+  seq.start(env.agent.sequencer);
+  phase.drop_objection(this, &quot;sequence completed&quot;);
+endtask
+</code></pre>
+<p>练习 6：在 sequence 完成后再等待两个时钟周期，然后 drop objection；解释为何要给 monitor/scoreboard 留出最后响应的处理时间。之后删掉 drop，观察 watchdog/仿真结束行为。</p>
+<h2 id="10-factory允许替换组件而不改环境源码">10. Factory：允许替换组件而不改环境源码</h2>
+<p>factory 把“创建哪个类”与“环境怎么组织”分开。组件用 <code>type_id::create</code> 创建，并通过 <code>uvm_component_utils</code> 或 object 宏注册；test 可以用 factory override 把基础 driver、sequence 或 scoreboard 换成派生类。</p>
+<pre><code class="language-systemverilog">// 教学片段
+mem_driver::type_id::set_type_override(slow_mem_driver::get_type());
+</code></pre>
+<p>若环境直接 <code>new</code> 所有组件，替换通常要改环境代码；用 factory 后，同一 env 可配不同实现。Factory 不是为了炫技：当需要注入错误、延迟、特殊协议行为或扩展检查时，它让复用更容易。优先使用类型 override；实例 override 能精确替换某个层级实例，但路径配置更容易出错。</p>
+<p>练习 7：创建一个派生 driver，让每笔请求额外延迟一拍；在 test 中通过 override 替换基础 driver，确认 env 源文件不变。</p>
+<h2 id="11-config-db-与-virtual-interface把连接配置传到组件">11. Config DB 与 Virtual Interface：把连接配置传到组件</h2>
+<p>UVM class 无法直接声明静态 interface 实例，所以顶层通常把 interface 句柄放进 <code>uvm_config_db</code>，driver/monitor 在 build 阶段取出。config_db 也能传 active/passive、延迟参数、地址范围等配置。</p>
+<pre><code class="language-systemverilog">// 顶层教学片段：接口实例和 UVM 启动代码被省略
+uvm_config_db#(virtual mem_bus_if)::set(null, &quot;uvm_test_top.env.agent*&quot;, &quot;vif&quot;, bus_if);
+run_test();
+</code></pre>
+<pre><code class="language-systemverilog">// 组件教学片段
+if (!uvm_config_db#(virtual mem_bus_if)::get(this, &quot;&quot;, &quot;vif&quot;, vif))
+  `uvm_fatal(&quot;NOVIF&quot;, &quot;mem_bus_if was not configured&quot;)
+</code></pre>
+<p>配置路径的 scope 与 wildcard 要有纪律。范围太宽会让多个 agent 意外拿到同一个 interface；拼错路径可能造成 null handle，最好缺失即 fatal。接口句柄传给组件后，driver 使用它驱动，monitor 使用它采样。</p>
+<p>练习 8：分别把 agent 配成 active 与 passive，确认 passive 模式不创建 driver/sequencer 但仍能监视；把错误 key 改错，确认报错发生在启动早期且信息可定位。</p>
+<h2 id="12-tlm-与-analysis-port组件间传数据">12. TLM 与 Analysis Port：组件间传数据</h2>
+<p>TLM 是组件间传递事务的接口机制。driver/sequencer 常用 sequence item port；monitor 常用 analysis port 广播事务；scoreboard 用 analysis implementation 接收。analysis 写入是广播式、零时间调用，不提供背压；订阅者要自己保存需要延后处理的数据。</p>
+<pre><code class="language-systemverilog">// 教学片段
+uvm_analysis_port #(mem_item) ap;
+uvm_analysis_imp  #(mem_item, mem_scoreboard) analysis_export;
+
+function void connect_phase(uvm_phase phase);
+  agent.monitor.ap.connect(scoreboard.analysis_export);
+endfunction
+</code></pre>
+<p>熟悉 FineSim 时，可把 analysis transaction 想成一条结构化观察记录，连接关系是数据订阅拓扑，而不是 DUT 引脚连接。一个 analysis port 可以连多个消费者；消费对象必须避免共享可变句柄。</p>
+<p>练习 9：新增一个 coverage collector 订阅同一个 monitor analysis port，统计读写次数；不要在 monitor 里直接调用 scoreboard 方法。</p>
+<h2 id="13-functional-coverage知道测到了哪些场景">13. Functional Coverage：知道测到了哪些场景</h2>
+<p>功能覆盖率来自验证计划中的场景模型；它回答“计划中的行为有没有发生”，而不是“代码执行到哪些行”。coverage collector 可采 transaction 字段，用 covergroup/coverpoint/cross 记录读写类型、地址区域、数据类别及关键组合。</p>
+<pre><code class="language-systemverilog">// 教学片段
+covergroup mem_cg with function sample(bit wr, bit [7:0] addr);
+  cp_op: coverpoint wr { bins read = {0}; bins write = {1}; }
+  cp_region: coverpoint addr[7:5] { bins low = {[0:1]}; bins high = {[6:7]}; }
+  op_x_region: cross cp_op, cp_region;
+endgroup
+</code></pre>
+<p>真实覆盖模型要从验证计划推导，避免大量无意义 cross。覆盖达到 100% 也不证明设计正确；它只证明模型中定义的 bin 被采到。代码覆盖率与功能覆盖率回答不同问题。DRAM 中可逐步把 bank、row/column 行为、命令组合、间隔与刷新窗口映射成覆盖点，但不能照搬本教学总线。</p>
+<p>练习 10：跑固定写读场景，先看覆盖缺哪些 bin；再增加 sequence 覆盖空缺组合。写一段说明，指出覆盖模型遗漏了哪些真实场景。</p>
+<h2 id="14-regression从单场景到可重复验证">14. Regression：从单场景到可重复验证</h2>
+<p>回归的基本单位通常是“test 名称 + seed + 配置 + 仿真结果”。先保证同一个 seed 可复现，再扩大 seed 与配置组合。失败时保留命令、日志、seed、波形和软件版本。随机回归应设置超时、错误计数、结束条件与失败分类。初学阶段可在开源项目提供的命令行框架中理解回归；不要因为仿真器支持某些 UVM 示例，就推断它覆盖了商用 fullchip 环境所有特性。</p>
+<p>面试时可以这样概括：“我会先做可复现 directed test 验证基础路径，再用受约束随机扩大状态组合，功能覆盖检查计划场景是否触达，scoreboard 检查数据与协议结果，最后按 seed 和配置跑 regression，并确保每个失败能复现。”</p>
+<h2 id="15-ral寄存器抽象层的用途与边界">15. RAL：寄存器抽象层的用途与边界</h2>
+<p>UVM RAL（Register Abstraction Layer）把寄存器地址、字段、访问属性和 mirror value 建成对象模型，让 test 能用寄存器名读写，而不用处处写地址常数。adapter 把寄存器操作转换成总线 transaction；predictor 根据观察到的总线访问更新 mirror。对于有侧效应、只写、读清零、硬件异步更新等寄存器，访问策略和预测必须准确。</p>
+<pre><code class="language-systemverilog">// 教学片段：示意，不含完整 reg/block/map/adapter 定义
+reg_model.ctrl.write(status, 32'h1);
+reg_model.status.read(status, value);
+</code></pre>
+<p>对 DRAM 颗粒而言，命令接口常不是传统 CSR 总线；RAL 适合配置寄存器、PHY/控制器 CSR 或仿真模型控制寄存器，具体是否有用取决于项目架构。不要把所有 DRAM 命令都硬套成 RAL register。先理解 address map、field access policy、frontdoor/backdoor、mirror/predict，再决定实际适用面。</p>
+<p>练习 11：为教学总线 DUT 添加一个控制寄存器（如 enable），尝试把它建模为 RAL register；说明 RAL mirror 与 DUT 实际状态不一致的可能原因，并说明 predictor 如何帮助同步。</p>
+<h2 id="16-建议的开源阅读路线">16. 建议的开源阅读路线</h2>
+<ol>
+<li><strong>Accellera UVM 用户指南与参考实现</strong>：先查标准概念、类和 phase 行为。Accellera 提供 UVM 下载和 IEEE 1800.2 参考实现；在线版本可能随发布时间更新，教程概念阅读可从 UVM 1.2 用户指南入手，再对照当前参考实现。 <a href="https://www.accellera.org/downloads/standards/uvm">Accellera UVM 下载页</a> · <a href="https://www.accellera.org/images/downloads/standards/uvm/uvm_users_guide_1.2.pdf">UVM 1.2 用户指南 PDF</a></li>
+<li><strong>Antmicro 的 Verilator UVM example</strong>：小型、单一总线信号代理示例，适合按文件追踪 item → sequence → sequencer → driver → monitor → scoreboard → env → test。README 的构建步骤涉及获取 UVM 源码及特定 Verilator 配置；你当前版本是 5.032，不能据此承诺可直接运行。先读 README 和源码，再考虑升级或在其指定版本/环境中复现。 <a href="https://github.com/antmicro/verilator-uvm-example">仓库与 README</a></li>
+<li><strong>Verilator 官方文档</strong>：核实你安装版本所支持的 SystemVerilog 语法、命令选项和限制。 <a href="https://verilator.org/guide/latest/">Verilator 文档</a></li>
+<li><strong>进阶课程仓库</strong>：<code>universal-verification-methodology/learn_uvm2017_sv_verilator</code> 提供分模块材料，但 README 描述了较新的 Verilator 版本。用它学习目录和练习设计，不要把 newer-version 成功结果等同于 5.032 上可运行。 <a href="https://github.com/universal-verification-methodology/learn_uvm2017_sv_verilator">学习仓库</a></li>
+</ol>
+<p>本工作区还提供原创的 <a href="/sv-uvm/labs/03_uvm/README.html">UVM 简化存储器实验</a>，代码按本教程所述组件拆分，并带正常检查、随机读写、错误注入和 watchdog。教程和实验都没有在商业仿真器上验证；运行依赖已有 Questa/UVM 安装。</p>
+<p>阅读 Antmicro 项目时按此顺序：先看 <code>README.md</code> 与顶层 <code>tb.sv</code>，然后 <code>sig_item</code>、<code>sig_sequence</code>，再跟 <code>sequencer</code>、<code>driver</code>，之后看 <code>monitor</code>、<code>scoreboard</code>、<code>agent</code>、<code>env</code>、<code>test</code>、<code>pkg</code>。每看一个文件，回答“它接收什么、产生什么、何时运行、如何与邻居通信”。</p>
+<h2 id="17-完整学习路线与验收标准">17. 完整学习路线与验收标准</h2>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>动手任务</th>
+<th>验收标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A：总线与 SV 基础</td>
+<td>手写 req/ready DUT 与 directed test</td>
+<td>能解释握手边沿；波形和日志一致</td>
+</tr>
+<tr>
+<td>B：transaction/sequence</td>
+<td>定义 item，写固定写读和循环 sequence</td>
+<td>能区分 item、sequence、sequencer</td>
+</tr>
+<tr>
+<td>C：driver/monitor</td>
+<td>驱动接口并重建握手 transaction</td>
+<td>monitor 只报告观察，不依赖 sequence 内部字段</td>
+</tr>
+<tr>
+<td>D：scoreboard</td>
+<td>实现参考存储器、注入数据错误</td>
+<td>正确报出期望值/实际值和地址</td>
+</tr>
+<tr>
+<td>E：组件与连接</td>
+<td>组装 active agent、env、test</td>
+<td>能沿数据路径定位每个类的职责</td>
+</tr>
+<tr>
+<td>F：UVM 生命周期</td>
+<td>phases、objection、config_db、factory</td>
+<td>能解释启动、结束、接口获取与组件替换</td>
+</tr>
+<tr>
+<td>G：coverage/regression</td>
+<td>场景覆盖与多 seed 复现</td>
+<td>能区分功能覆盖与正确性检查；失败可复现</td>
+</tr>
+<tr>
+<td>H：RAL 与真实项目映射</td>
+<td>建简单寄存器模型，绘制 FineSim 对照图</td>
+<td>能说明 RAL 适用边界，并把 DRAM 验证经历映射到 UVM 思路</td>
+</tr>
+</tbody>
+</table>
+<p>每阶段记录：日期、投入时间、自己编写的内容、遇到的失败、已能口述的概念、下一次要补的点。遇到编译问题先缩小成一个语法或一个组件的问题，保存完整命令和错误头尾，不要用修改十几处的方式猜。</p>
+<h2 id="18-面试准备把现有经验讲成可迁移能力">18. 面试准备：把现有经验讲成可迁移能力</h2>
+<p>不要声称自己做过 UVM 项目。诚实说明目前有两年 DRAM FineSim fullchip 验证经验，能根据规范组织 pattern/sequence、观察波形、分析功能行为和定位问题；正在用可运行的小型 SV/UVM 环境补齐 OOP、TLM、scoreboard、coverage 和 regression 经验。重点展示你已完成的可复现实验，以及如何解释验证架构。</p>
+<p>可以练习这段 60 秒回答：</p>
+<blockquote>
+<p>我目前主要做 DRAM FineSim fullchip 验证，工作约两年，日常根据验证目标构造 pattern sequence，运行仿真并结合波形与检查结果定位问题。颗粒级验证方法和主流 UVM 环境有差异，我过去直接编写 SystemVerilog 的机会较少，所以我正在补齐 transaction、sequence/sequencer、driver/monitor 分层、scoreboard 参考模型和功能覆盖。我用一个简化存储器总线从 directed 场景开始，逐步做错误注入和随机回归，并把职责对应回现有的 FineSim pattern、波形观察与检查经验。我会清楚区分已有项目经验与个人练习，不把练习说成商业 UVM 项目。</p>
+</blockquote>
+<p>再准备 3 个具体故事：</p>
+<ol>
+<li>一次你如何从验证目标推导 pattern、选择观察点并判断结果。</li>
+<li>一次你如何利用波形、日志或复现步骤定位仿真问题。</li>
+<li>一个你亲手实现的 UVM 小实验：数据流、检查方式、注入过什么错误、如何复现。</li>
+</ol>
+<p>能完整回答这些追问才算通过：为什么 scoreboard 不直接读 sequence 的期望值？monitor 为什么不能复用一个可变 transaction？objection 忘记 drop 会怎样？functional coverage 100% 是否代表设计正确？RAL 是否适合 DRAM 命令？Verilator 5.032 能否保证运行较新的 UVM 示例？</p>
+<h2 id="参考资料">参考资料</h2>
+<ul>
+<li>Accellera, <a href="https://www.accellera.org/downloads/standards/uvm">UVM 下载与参考实现</a></li>
+<li>Accellera, <a href="https://www.accellera.org/images/downloads/standards/uvm/uvm_users_guide_1.2.pdf">UVM 1.2 用户指南</a></li>
+<li>Antmicro, <a href="https://github.com/antmicro/verilator-uvm-example">verilator-uvm-example</a></li>
+<li>Verilator, <a href="https://verilator.org/guide/latest/">官方用户指南</a></li>
+<li>Universal Verification Methodology, <a href="https://github.com/universal-verification-methodology/learn_uvm2017_sv_verilator">learn_uvm2017_sv_verilator</a></li>
+</ul>
+<p>学习资料是路线图，不代替你所在项目的协议规范、验证计划、仿真器手册和代码规范。每次学习反馈时，更新个人状态文件中的阶段、证据、困难和下一步；只有能重现的实验结果才记为“完成”。</p>
+<h2 id="8-在已安装环境中运行完整-uvm-实战">8. 在已安装环境中运行完整 UVM 实战</h2>
+<p>本节对应 <code>labs/03_uvm</code>，使用 WSL 中已安装的 Verilator 5.052 与 Accellera UVM 2020.3.1。这个实验是一个教学用简化存储器总线，不代表 DRAM 或 JEDEC 协议；它只用来练习验证环境的职责划分。</p>
+<h3 id="81-先运行再读源码">8.1 先运行，再读源码</h3>
+<p>在 WSL 中执行：</p>
+<pre><code class="language-bash">cd &quot;/mnt/d/cxy/SV&amp;UVM Learning/labs/03_uvm&quot;
+bash run_verilator.sh normal
+</code></pre>
+<p>脚本会把 Verilator 的临时生成目录放到 <code>/tmp/sv_uvm_lab03_verilator</code>，因为 Verilator 5.052 不允许在包含空格的目录中生成 <code>obj_dir</code>。源代码仍然可以保留在 Windows 工作目录中。</p>
+<p>正常结果应包含：</p>
+<pre><code class="language-text">[TEST] [PASS] checks=9 reads=9 writes=9 errors=0
+UVM_ERROR :    0
+UVM_FATAL :    0
+[PASS] UVM Verilator lab completed: normal
+</code></pre>
+<p>再运行故障注入：</p>
+<pre><code class="language-bash">bash run_verilator.sh fault
+</code></pre>
+<p>故障模式故意让 DUT 的读数据最低位翻转。正确的验证结果不是“仿真没有错误”，而是 scoreboard 报告 9 次 mismatch，并出现：</p>
+<pre><code class="language-text">[TEST] [EXPECTED_FAULT] checks=9 reads=9 writes=9 errors=9
+[PASS] UVM Verilator lab completed: fault
+</code></pre>
+<p>这里的 <code>[EXPECTED_FAULT]</code> 表示 checker 成功捕获了故障；它不表示 DUT 是正确的。</p>
+<h3 id="82-从一笔事务追踪到引脚">8.2 从一笔事务追踪到引脚</h3>
+<p>以 <code>send(1, 8'h08, 32'h1234_5678)</code> 为例，按下面顺序阅读：</p>
+<ol>
+<li><code>mem_sequence.body()</code> 创建并发送 <code>mem_item</code>。</li>
+<li><code>start_item/finish_item</code> 将 item 交给 <code>mem_sequencer</code>。</li>
+<li><code>mem_driver.run_phase()</code> 调用 <code>get_next_item()</code>，在下降沿驱动 <code>req/write/addr/wdata</code>。</li>
+<li><code>mem_dut.sv</code> 在上升沿写入存储数组，并组合产生 <code>ready/rdata</code>。</li>
+<li><code>mem_monitor.run_phase()</code> 在上升沿观察真实握手，重新创建一个 observed item。</li>
+<li><code>agent.monitor.ap</code> 通过 <code>analysis_export</code> 调用 scoreboard 的 <code>write()</code>。</li>
+<li><code>mem_scoreboard</code> 更新参考模型；读操作比较 <code>expected</code> 和 <code>actual</code>。</li>
+</ol>
+<p>对应的数据流是：</p>
+<pre><code class="language-text">mem_test
+  └─ mem_sequence
+       └─ mem_sequencer
+            └─ mem_driver ── mem_if ── mem_dut
+                                      │
+                         mem_monitor ◄┘
+                              │ analysis_port
+                              ▼
+                       mem_scoreboard
+</code></pre>
+<h3 id="83-每个文件应该回答的问题">8.3 每个文件应该回答的问题</h3>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>阅读时要回答的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mem_if.sv</code></td>
+<td>一次传输何时发生？谁驱动信号？谁采样信号？</td>
+</tr>
+<tr>
+<td><code>mem_dut.sv</code></td>
+<td>DUT 在哪个边沿更新存储？故障注入改了什么？</td>
+</tr>
+<tr>
+<td><code>mem_pkg.sv</code> 的 <code>mem_item</code></td>
+<td>一笔事务有哪些字段和约束？</td>
+</tr>
+<tr>
+<td><code>mem_sequence</code></td>
+<td>directed 操作和 constrained-random 操作如何混合？</td>
+</tr>
+<tr>
+<td><code>mem_driver</code></td>
+<td>sequence item 如何变成 pin-level 波形？</td>
+</tr>
+<tr>
+<td><code>mem_monitor</code></td>
+<td>为什么必须从接口重新采样，而不是直接把 sequence 的 item 发给 scoreboard？</td>
+</tr>
+<tr>
+<td><code>mem_scoreboard</code></td>
+<td>参考模型保存了什么状态？怎样区分写、读未初始化和读 mismatch？</td>
+</tr>
+<tr>
+<td><code>mem_agent</code></td>
+<td>sequencer、driver、monitor 在哪里创建和连接？</td>
+</tr>
+<tr>
+<td><code>mem_env</code></td>
+<td>agent 和 scoreboard 在哪里连接？</td>
+</tr>
+<tr>
+<td><code>mem_test</code></td>
+<td>objection 何时 raise/drop？测试如何验证 checker 自己工作？</td>
+</tr>
+<tr>
+<td><code>tb.sv</code></td>
+<td>virtual interface 如何通过 <code>uvm_config_db</code> 传给组件？仿真如何结束？</td>
+</tr>
+</tbody>
+</table>
+<h3 id="84-波形和日志">8.4 波形和日志</h3>
+<p>运行脚本后会生成：</p>
+<ul>
+<li><code>labs/03_uvm/uvm_normal.log</code>：正常用例日志。</li>
+<li><code>labs/03_uvm/uvm_fault.log</code>：故障注入日志。</li>
+<li><code>labs/03_uvm/build_wave.vcd</code>：由 Verilator <code>--trace</code> 生成的真实 VCD 波形。</li>
+</ul>
+<p>在 WSL 中查看波形：</p>
+<pre><code class="language-bash">gtkwave build_wave.vcd
+</code></pre>
+<p>建议先加入 <code>tb.clk</code>、<code>tb.bus.rst_n</code>、<code>tb.bus.req</code>、<code>tb.bus.write</code>、<code>tb.bus.addr</code>、<code>tb.bus.wdata</code>、<code>tb.bus.ready</code> 和 <code>tb.bus.rdata</code>。观察重点是：driver 在下降沿改变请求，monitor 在下一个上升沿看到握手，读数据在完成时被 scoreboard 检查。</p>
+<h3 id="85-实战练习">8.5 实战练习</h3>
+<ol>
+<li>把 <code>repeat (8)</code> 改成 <code>repeat (20)</code>，同步修改 <code>mem_test</code> 的计数检查，确认 scoreboard 仍能工作。</li>
+<li>把 DUT 的故障从 <code>32'h1</code> 改成 <code>32'h100</code>，确认 mismatch 仍被捕获。</li>
+<li>在 <code>mem_item</code> 增加 <code>rand bit [1:0] byte_en</code>，先把它打印出来，再决定它是否应该进入参考模型比较。</li>
+<li>把 monitor 的 <code>tr = mem_item::type_id::create(&quot;observed&quot;)</code> 改成复用同一个对象，观察为什么 analysis subscriber 可能看到被后续事务覆盖的内容，然后恢复为每笔创建新对象。</li>
+<li>在 scoreboard 增加非法地址检查，并在 sequence 中故意发送一个未对齐地址，记录 checker 应该报什么错误。</li>
+<li>给 <code>mem_driver</code> 增加一个可配置等待周期，体会“transaction 时间”和“接口时序”为什么必须分离。</li>
+</ol>
+<p>完成这些练习后，你应该能独立写出一个小型 UVM 环境的骨架：transaction、sequence、sequencer、driver、monitor、scoreboard、agent、env、test 和 top-level wiring，并能用一个故障注入证明 checker 不是“只会报 PASS”。</p>
+<h2 id="9-verilator-与商业仿真器的边界">9. Verilator 与商业仿真器的边界</h2>
+<p>本实验已在本机 WSL 中用 Verilator 5.052 + Accellera UVM 2020.3.1 实际编译和运行。Verilator 输出的 <code>UVM_ERROR=0/UVM_FATAL=0</code> 是本机运行证据；它不等价于 Questa、VCS 或 Xcelium 对全部 SystemVerilog/UVM 特性的兼容性结论。</p>
+<p>后续使用商业仿真器时，应重新验证 clocking block、virtual interface、随机约束、覆盖率数据库、DPI、assertion 和 RAL 等特性。这个教学总线的时序也不能直接当作 DRAM 验证时序。</p>
+<hr />
+<p><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">← 返回学习导航</a></p>
+</article><div class="doc-bottom"><a href="/sv-uvm/">← 返回学习目录</a><a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">实验源码 ↗</a></div></main></div><footer>ChenWellesCxy HUST · SV / UVM 学习笔记 <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">查看源码仓库 ↗</a></footer></body></html>

@@ -1,0 +1,235 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SV 官方文档详解：语言基础与仿真语义 | ChenWellesCxy HUST</title><meta name="description" content="SV / UVM 学习教程、实验与 CoverageModel 实践。"><link rel="canonical" href="https://chenwellescxy.github.io/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html"><link rel="stylesheet" href="/site-shell.css"><link rel="stylesheet" href="/sv-uvm/style.css"></head><body><a class="skip" href="#content">跳到内容</a><header class="cw-site-header"><div class="cw-bar"><a class="cw-brand" href="/">ChenWellesCxy <span>HUST</span></a><nav class="cw-links" aria-label="网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><details class="cw-mobile"><summary>导航</summary><nav aria-label="手机网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></details></div></header><div class="reader"><aside><a class="back" href="/sv-uvm/">← SV / UVM 学习目录</a><details open><summary>本页章节</summary><nav aria-label="本页章节"><a href="#1-设计testbench与仿真的三个层次">1. 设计、testbench与仿真的三个层次</a><a href="#2-词法常量与预处理">2. 词法、常量与预处理</a><a href="#3-四态二态与默认值">3. 四态、二态与默认值</a><a href="#4-网络与变量wire不是旧版logic">4. 网络与变量：wire不是旧版logic</a><a href="#5-位宽符号性与表达式上下文">5. 位宽、符号性与表达式上下文</a><a href="#6-运算符逻辑位操作与未知值">6. 运算符：逻辑、位操作与未知值</a><a href="#7-ifcaseinside与未知状态">7. if、case、inside与未知状态</a><a href="#8-packedunpacked数组与结构体">8. packed/unpacked数组与结构体</a><a href="#9-定长数组动态数组queue关联数组">9. 定长数组、动态数组、queue、关联数组</a><a href="#10-enum与类型转换">10. enum与类型转换</a><a href="#11-string格式化与可定位日志">11. string、格式化与可定位日志</a><a href="#12-时间单位精度与舍入">12. 时间单位、精度与舍入</a><a href="#13-调度activenbaobservedreactive">13. 调度：Active、NBA、Observed、Reactive</a><a href="#14-always_combalways_ffalways_latch">14. always_comb、always_ff、always_latch</a><a href="#15-taskfunction耗时与无时间计算">15. task/function：耗时与无时间计算</a><a href="#16-参数传递inputoutputinoutref">16. 参数传递：input/output/inout/ref</a><a href="#17-staticautomatic与递归重入">17. static、automatic与递归/重入</a><a href="#18-作用域端口参数与generate">18. 作用域、端口、参数与generate</a><a href="#19-文件io与外部pattern">19. 文件I/O与外部Pattern</a><a href="#20-编译elaborate仿真失败怎么区分">20. 编译、elaborate、仿真失败怎么区分</a><a href="#21-超出入门rtltb的语言部分">21. 超出入门RTL/TB的语言部分</a><a href="#22-综合复习与参考答案">22. 综合复习与参考答案</a></nav></details><details><summary>其他文档</summary><nav aria-label="专题文档"><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a><a href="/sv-uvm/docs/SV%E6%95%99%E7%A8%8B.html">从 Pattern 到 SystemVerilog</a><a href="/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html">UVM 入门教程</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html" aria-current="page">SV 语言基础详解</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">SV 验证主题详解</a><a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html">UVM 官方资料详解</a><a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html">独立实现 CoverageModel</a><a href="/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html">参考项目精读</a><a href="/sv-uvm/labs/03_uvm/README.html">UVM 简化存储器实验</a><a href="/sv-uvm/docs/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5.html">开源项目实践</a><a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html">免费 SV/UVM 环境选型</a><a href="/sv-uvm/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.html">环境与验证记录</a><a href="/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html">学习资源调研</a></nav></details></aside><main id="content"><div class="doc-top"><div class="eyebrow">SV / UVM · 深入理解</div><h1>SV 官方文档详解：语言基础与仿真语义</h1><div class="source">项目文档快照 · 2026-10-21 · <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning/blob/f09cfdaf87f25dce129bcc9a6b7c7824387e9d4b/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.md">查看原文 ↗</a></div></div><article><p>这本基础讲义为“以前写过Verilog，现在需要系统复习”的你准备。关键不是记更多关键字，而是能回答：数据到底有多少位，未知值是否还在，哪个过程在什么时刻看到哪个值，代码到底建立了什么结构。</p>
+<p>规范入口：<a href="https://standards.ieee.org/ieee/1800/7743/">IEEE 1800-2023</a>。各节按主题讲解，章节号属于本文；不冒充标准条款号。本篇例子为原创，除明确指向实验05或其他已运行实验外，代码片段是教学示意。遇到复杂语义，以标准原文和所用仿真器版本复核。工具手册用于确认支持范围，不能反过来定义语言。</p>
+<h2 id="1-设计testbench与仿真的三个层次">1. 设计、testbench与仿真的三个层次</h2>
+<p>硬件描述不是普通程序的逐行执行。可以把一个仿真分成三层：<strong>建立结构</strong>、<strong>启动并发过程</strong>、<strong>在事件队列中执行过程</strong>。</p>
+<p>编译器首先解析语法、类型、名字；elaboration决定实例数、参数、连接与generate选择；仿真开始后，各initial/always按事件和时间推进。<code>for generate</code>创建四个实例，不是在仿真时执行四次任务；<code>initial for</code>是在一个过程里执行循环，不创建四块独立硬件。</p>
+<p>对DRAM采样器：每个subchannel一个generate采样块是结构复制；每次命令到来时遍历bank状态是运行中的行为。分清这两者，才能知道哪些索引必须是常量、哪些可以动态变化。</p>
+<p><strong>练习：</strong> 把NUM_BANK从2改成4时，是增加实例还是只增加数组元素？答案取决于变量用在generate边界、数组维度还是过程循环；必须看源码位置，不能只看参数名。</p>
+<h2 id="2-词法常量与预处理">2. 词法、常量与预处理</h2>
+<p><code>8'hA5</code>明确宽度8、十六进制；<code>'0</code>在使用上下文中填零，<code>'1</code>填一。<code>32'd10</code>是明确宽度的十进制常量。无尺寸普通整数常量通常至少32位，宽度和signedness会参与表达式推导，所以不要在宽向量掩码里随意写 <code>1 &lt;&lt; index</code>。</p>
+<pre><code class="language-systemverilog">logic [63:0] mask;
+mask = 64'b1 &lt;&lt; 40; // 明确左操作数宽度，意图容易检查
+</code></pre>
+<p><code>parameter/localparam</code>有作用域与类型；宏是预处理文本替换。用parameter表达模块配置，用typedef表达类型，避免把所有东西写成宏。宏可改变编译结果，运行时plusarg则不改变已经elaborate的模块结构。</p>
+<p><code>include</code>复制文本到当前位置；<code>import</code>让包中符号可见。二者不互相替代。头文件重复定义可用include guard；包应由文件列表控制只编译一次，而不是每个文件都include整个包。</p>
+<p><strong>练习：</strong> 为什么修改 <code>+SEED=17</code>不必重新编译，而修改FIFO DEPTH通常需要重新elaborate？前者决定运行中的随机过程，后者可能改变结构与位宽。</p>
+<h2 id="3-四态二态与默认值">3. 四态、二态与默认值</h2>
+<p><code>logic/reg</code>是四态，<code>bit</code>是二态；<code>integer</code>是四态整型，<code>int</code>也是四态整型，二者不能与 <code>bit</code> 混为一谈。<code>byte/shortint/int/longint</code>默认signed，可显式加unsigned。<code>time</code>是64位unsigned四态；<code>real/realtime</code>表达实数，不用于保存精确位模式。</p>
+<p>四态变量未显式初始化常见为X；二态变量通常默认0。把X转成二态会丢失未知状态。<strong>输入刺激可以用bit，观察DUT输出通常先用logic</strong>，这不是语法强制规则，而是避免掩盖未知值的验证设计选择。</p>
+<p>实验05检查：四态变量确实为未知，转换到bit后成为0。这个实验应使用Icarus等四态模拟器；Verilator主要采用二态模型，不能拿相同输出要求判断它是否满足四态仿真目的。<a href="https://verilator.org/guide/latest/languages.html">Verilator说明</a></p>
+<p><strong>练习：</strong> scoreboard里的 <code>bit [31:0] actual</code> 为什么可能漏掉DUT的X？答案不是比较操作符不够严格，而是比较前已经丢失信息。</p>
+<h2 id="4-网络与变量wire不是旧版logic">4. 网络与变量：wire不是旧版logic</h2>
+<p>网络表示连接和解析，变量存储过程赋予的值。连续赋值 <code>assign</code>描述持续的驱动关系；过程赋值在过程执行时更新变量。多个驱动源、三态总线和inout需要明确驱动解析。</p>
+<pre><code class="language-systemverilog">wire [7:0] dq;
+logic drive_enable;
+logic [7:0] drive_data;
+assign dq = drive_enable ? drive_data : 8'hzz;
+</code></pre>
+<p>上例表达驱动释放，总线上也可能有其他驱动。不能把数字Z的建模直接等同于模拟电路的真实高阻、电压或电流。端口方向、显式net/variable kind及工具规则也会影响合法连接，避免靠 <code>logic</code> 一个词猜测所有行为。</p>
+<p><strong>练习：</strong> 两个强驱动分别给0和1时为什么可能得到X？这个X来自冲突解析，和未初始化X的成因不同；debug时要查驱动者而非只补复位。</p>
+<h2 id="5-位宽符号性与表达式上下文">5. 位宽、符号性与表达式上下文</h2>
+<p>这是验证代码中最容易“结果看起来正常但边界错”的部分。先判断每个操作数的位宽和signedness，再判断运算结果是否受外层上下文影响，最后看赋值是否扩展或截断。</p>
+<pre><code class="language-systemverilog">byte signed a;
+byte unsigned b;
+int signed ai, bi;
+a = -1; b = 1;
+ai = a; bi = b;
+</code></pre>
+<p>比较 <code>a &lt; b</code> 时混合unsigned会改变解释；使用明确扩展到signed int的ai、bi可表达数学上的-1与1比较。<code>$signed</code>改变符号解释，不自动扩大位宽；<code>int'(...)</code>是类型转换，同时改变尺寸。不能把这两者当成同一工具。</p>
+<pre><code class="language-systemverilog">logic [7:0] x,y;
+logic [8:0] wide_sum;
+wide_sum = {1'b0,x} + {1'b0,y};
+</code></pre>
+<p>显式扩展的目的是让意图清楚，避免把“两个8位相加永远只有8位”这种错误口诀带进上下文定宽表达式。</p>
+<p><strong>实验05：</strong> 验证255+1在显式9位结果中为256，截断到8位变为0；验证混合符号比较与显式扩展后的区别。</p>
+<h2 id="6-运算符逻辑位操作与未知值">6. 运算符：逻辑、位操作与未知值</h2>
+<p><code>&amp;</code>是逐位与；作为单目运算符时是归约与；<code>&amp;&amp;</code>做逻辑判断并给出一位结果。<code>|/||</code>同理。<code>^vector</code>是归约异或，常用于奇偶校验，但含未知时也可能产生未知。</p>
+<p><code>==/!=</code>是逻辑相等，遇到某些未知组合会产生X；<code>===/!==</code>逐位把X/Z也作为值比较，结果明确为0或1。<code>==?</code>是通配相等，右操作数中的通配位有特殊意义，使用前应明确允许忽略哪些位。</p>
+<p>移位左侧的类型很重要：<code>&gt;&gt;</code>逻辑右移补0；<code>&gt;&gt;&gt;</code>在左操作数为signed时保留符号。拼接通常按无符号位串理解，所以把signed量放进拼接后再算术移位可能不符合预期。</p>
+<p><strong>练习：</strong> 不用仿真，解释 <code>8'hF0 &gt;&gt; 1</code>；再把 <code>8'hF0</code>存入signed变量并用 <code>&gt;&gt;&gt;1</code>。预期分别0x78与0xF8。若转为unsigned再 <code>&gt;&gt;&gt;</code>，不能继续期待符号扩展。</p>
+<h2 id="7-ifcaseinside与未知状态">7. if、case、inside与未知状态</h2>
+<p><code>if</code>条件为X并不会自动当成“未知分支同时执行”，实际分支选择可能掩盖X，称作某些场景下的X乐观问题。普通case按四态匹配；<code>casez/casex</code>扩大通配范围，尤其casex可能把真实错误的X当作任意值。</p>
+<p>命令译码优先明确未知输入处理，别用casex“让各种Pattern都匹配”。<code>inside</code>适合表达集合和范围；<code>unique/priority</code>表达对分支关系的承诺，并可能触发工具检查，不能用它替代完整default或输入合法性设计。</p>
+<p><strong>练习：</strong> 对CA输入加入一位X。你希望decoder产生invalid、unknown command还是匹配某个合法命令？先写需求，再选择case形式；不能因仿真通过就认定译码策略正确。</p>
+<h2 id="8-packedunpacked数组与结构体">8. packed/unpacked数组与结构体</h2>
+<pre><code class="language-systemverilog">logic [1:0][3:0] packed_ca;
+logic [3:0] unpacked_ca[2];
+</code></pre>
+<p>二者都能表示两组4bit，但前者整体是8bit位串，后者是两个元素组成的unpacked数组。维度的方向影响索引；元素遍历用 <code>foreach</code>可减少对范围方向的误判。</p>
+<p><code>struct packed</code>的成员需可按packed位布局组织，适合可序列化的小记录；普通struct可含更广泛类型，例如协议事件中的时间或动态容器。union共享存储，应明确当前有效解释，避免把一种布局当另一种使用。</p>
+<p>实验05用enum+packed struct表达教学命令，并用 <code>$bits</code>检查实际总位数。参考项目的事件struct包含协议语义，不能只为了省空间就随意改成packed。</p>
+<p><strong>练习：</strong> 对包含valid(1)、cmd(2)、bank(1)、addr(4)的packed struct预测总位数8；加realtime时间戳时，为什么应重新考虑是否packed？</p>
+<h2 id="9-定长数组动态数组queue关联数组">9. 定长数组、动态数组、queue、关联数组</h2>
+<table>
+<thead>
+<tr>
+<th>结构</th>
+<th>适合场景</th>
+<th>常见失误</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>定长数组</td>
+<td>bank表、小memory</td>
+<td>索引越界、reset漏清部分元素</td>
+</tr>
+<tr>
+<td>动态数组</td>
+<td>事务payload，长度运行时确定</td>
+<td>new后旧数据丢失、长度与约束不一致</td>
+</tr>
+<tr>
+<td>queue</td>
+<td>FIFO期望结果、顺序响应</td>
+<td>空队列pop、积压无界、对象别名</td>
+</tr>
+<tr>
+<td>关联数组</td>
+<td>大而稀疏的地址/ID空间</td>
+<td>不检查exists、把未访问与零值混淆</td>
+</tr>
+</tbody>
+</table>
+<p>数组方法如 <code>find/find_index</code>返回集合，不保证结果只有一个；<code>sum()</code>的元素表达式位宽也影响结果，统计bit数组时常需要 <code>with (int'(item))</code>防止意外定宽。排序和搜索只处理数据，不自动赋予协议先后关系。</p>
+<p><strong>练习：</strong> 同时有多个outstanding请求且响应乱序时，为什么只用FIFO参考队列可能误报？需要能唯一匹配响应的ID/上下文，关联数组是候选存储，但ID复用与reset epoch仍需设计。</p>
+<h2 id="10-enum与类型转换">10. enum与类型转换</h2>
+<p>enum让名字代表明确编码，提升诊断能力。强类型约束可防止随意把整数塞进枚举，但显式强制转换仍可能构造不在命名集合中的值。</p>
+<pre><code class="language-systemverilog">typedef enum logic [1:0] {IDLE, OPEN, CLOSED} state_t;
+state_t state;
+int raw;
+// 教学片段：检查动态转换成功与否
+if (!$cast(state,raw)) $error(&quot;invalid state encoding&quot;);
+</code></pre>
+<p><code>state_t'(raw)</code>的静态转换和 <code>$cast</code>的动态合法性检查不是等价操作。解码外部信号时，最好保留invalid/unknown分支，不能假设所有二进制编码都对应有效状态。</p>
+<p><strong>练习：</strong> raw=3能否对应上例有效enum项？以动态转换返回值判断；不要把未命名编码当CLOSED。</p>
+<h2 id="11-string格式化与可定位日志">11. string、格式化与可定位日志</h2>
+<p>string是动态字符数据，不是固定长度packed总线。项目中的 <code>reg [127:0] tb_cmd_string</code> 本质是固定宽度位串，不能因为名字含string就套用string全部方法。</p>
+<p><code>$sformatf</code>返回格式化字符串；<code>$display</code>输出并换行；<code>$write</code>不自动换行；<code>$strobe</code>适合观察当前time slot后部稳定值，但它不替代协议采样策略。</p>
+<p>失败日志至少包含用例/seed、仿真时刻、接口或bank、命令/地址、预期与实际、规则ID。只输出“fail”会迫使你重新打开大量波形。</p>
+<p><strong>练习：</strong> 将实验02的mismatch解释为“在哪里/何时/哪条规则/预期什么/实际什么”，缺少哪些信息可继续补。</p>
+<h2 id="12-时间单位精度与舍入">12. 时间单位、精度与舍入</h2>
+<p><code>timeunit</code>决定无单位delay的尺度；<code>timeprecision</code>决定时间精度。<code>1ns/1ps</code>作用域里 <code>#1</code>是1ns。显式 <code>#2ns</code>比依赖外围timescale更直观。</p>
+<p>整数time与realtime的赋值/换算可能有舍入；跨时钟域的周期计数也不是绝对时间。计算DRAM时序时先统一单位，明确比较的是边沿计数差还是实际时间差，不能把“3个cycle”和“3ns”相加。</p>
+<p>举例：教学规则 <code>gap_cycles &gt;= 3</code>不描述频率改变后的绝对时间门限；正式规则需按适用规范决定cycle和time双重条件及取整策略。具体LPDDR6值不由教材提供。</p>
+<p><strong>练习：</strong> 同一个绝对delay在1ns与1ps timeunit作用域中如何表达？使用显式单位、统一helper和边界向量证明，不靠隐式换算猜结果。</p>
+<h2 id="13-调度activenbaobservedreactive">13. 调度：Active、NBA、Observed、Reactive</h2>
+<p>一个仿真时刻内部有多个调度区域，不是所有语句都同时取更新后的值。理解以下常见关系足以开始分析race，但标准还有更多区域和迭代规则。</p>
+<table>
+<thead>
+<tr>
+<th>区域/动作</th>
+<th>教学观察点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Preponed采样</td>
+<td>常用于并发断言读取时钟事件到来前的样本</td>
+</tr>
+<tr>
+<td>Active执行</td>
+<td>普通module过程执行、阻塞赋值、非阻塞赋值右值求值</td>
+</tr>
+<tr>
+<td>NBA更新</td>
+<td>非阻塞赋值目标随后更新</td>
+</tr>
+<tr>
+<td>Observed求值</td>
+<td>并发断言根据采样值检查属性</td>
+</tr>
+<tr>
+<td>Reactive动作</td>
+<td>与断言动作、program过程有关</td>
+</tr>
+<tr>
+<td>Postponed观察</td>
+<td><code>$strobe</code>等观察稳定结果</td>
+</tr>
+</tbody>
+</table>
+<p>两个普通always在同一posedge醒来，不应依赖它们的源码排列决定先后；若一个阻塞写、另一个读，可能产生race。<code>#0</code>进入另一区域但并不自动解决所有竞争，也不是“等一个周期”。</p>
+<p>看 <a href="/sv-uvm/docs/waves/01_scheduling.svg">实验01实测波形</a>：波形图展示物理时间上的值，$display日志则揭示NBA之前的观察。两者要结合，不能从一条15ns垂直线推断所有语句都见到同样数据。</p>
+<p><strong>练习：</strong> 同一个posedge下，为什么DUT <code>q &lt;= d</code>之后TB仍可能读到旧q？给出“下一下降沿检查”与“符合接口协议的clocking采样”两类方案，并说明是否检查同一语义时点。</p>
+<h2 id="14-always_combalways_ffalways_latch">14. always_comb、always_ff、always_latch</h2>
+<p><code>always_comb</code>表达组合意图，自动敏感性和执行规则比 <code>always @*</code>更专门；应把默认赋值和每条分支覆盖写清楚。不要一边依赖中间变量被写入重新触发本过程，一边又在它赋值前读取它。</p>
+<p><code>always_ff</code>表达受时钟事件控制的状态更新意图，对写入者和事件控制等有限制；通常使用非阻塞赋值。<code>always_latch</code>表达锁存意图，而不是修补忘记写else的万能关键字。</p>
+<pre><code class="language-systemverilog">always_comb begin
+  next_state = state;
+  if (reset_request) next_state = IDLE;
+  else if (act_seen) next_state = OPEN;
+end
+</code></pre>
+<p>这里保持的是next_state变量的组合默认值，不是保留它自身上一次执行留下的旧值。真正状态由独立时序过程更新。</p>
+<p><strong>练习：</strong> 不给组合块某分支赋值，会产生什么行为？分别从仿真记忆、综合锁存器、工具告警解释，不能只回答“语法错”。</p>
+<h2 id="15-taskfunction耗时与无时间计算">15. task/function：耗时与无时间计算</h2>
+<p>function用于不挂起仿真时间的计算，可以有返回值，也可以返回void。task允许包含delay/event/wait，也可以完全不耗时。不要在function里调用可能阻塞的任务。</p>
+<pre><code class="language-systemverilog">function automatic logic [7:0] masked_write(
+  input logic [7:0] old_v,new_v,mask);
+  return (old_v &amp; ~mask) | (new_v &amp; mask);
+endfunction
+</code></pre>
+<p>这类纯函数特别适合MR写掩码、简单解码与参考模型：输入明确、输出确定，容易做表驱动自检。引脚采样和等待属于另一个层次，避免让一个decoder helper隐式等时钟。</p>
+<p><strong>实验05：</strong> 验证掩码更新、零掩码与全掩码等小函数行为。<strong>扩展：</strong> 为每个输入边界写明期望，不从待测函数自身生成答案。</p>
+<h2 id="16-参数传递inputoutputinoutref">16. 参数传递：input/output/inout/ref</h2>
+<p>input按值传入，output在返回时复制输出，inout在进入/返回时复制；ref是对实际变量的引用，类型匹配要求不同。<code>const ref</code>可避免大数据结构值拷贝并禁止经该形式参数修改数据，但不能把它误认为对所有别名路径的深层不可变保证。</p>
+<p>task传output时，调用尚未返回，外部变量不一定已看到task内部赋值；ref则可在task执行期间改变外部值。对于class参数，按值复制的通常是对象句柄，而非深拷贝整个对象，所以input class仍可能修改同一个对象的成员。</p>
+<p><strong>练习：</strong> task里先output赋值再等10ns，调用方在5ns是否已看到新值？与ref作对比；引用参数在并发子线程中可能有语言寿命限制，复杂用法查LRM，不能让线程持有已结束调用中的无效引用。</p>
+<h2 id="17-staticautomatic与递归重入">17. static、automatic与递归/重入</h2>
+<p>module内子程序的默认存储期与class方法不同。显式automatic便于局部变量在每次并发调用中独立存在；static变量跨调用共享。<code>static function</code>作为class方法修饰，涉及无需对象访问的方法，不等同于“函数局部变量全都static”。</p>
+<pre><code class="language-systemverilog">task automatic delayed_check(input int value,input time delay_time);
+  int saved;
+  saved=value;
+  #delay_time;
+  if (saved!=value) $fatal(1,&quot;unexpected local overwrite&quot;);
+endtask
+</code></pre>
+<p>实验05并发调用两个不同值/等待时间的任务，证明automatic调用各有自己的局部数据。真实TB多个subchannel调用同一个task时，这种独立性很重要。</p>
+<p><strong>练习：</strong> 把两条并发路径改成共享全局scratch变量，设计能确定暴露覆盖的时间安排。不要仅靠某次跑通就认为没有race。</p>
+<h2 id="18-作用域端口参数与generate">18. 作用域、端口、参数与generate</h2>
+<p>module参数决定宽度和深度；localparam表达内部推导常量；type parameter可提高可复用性。<code>$clog2(1)</code>为0，小深度FIFO的地址宽度表达式必须考虑最小值，不能盲写 <code>logic [$clog2(DEPTH)-1:0]</code>。</p>
+<pre><code class="language-systemverilog">localparam int ADDR_W = (DEPTH &lt;= 1) ? 1 : $clog2(DEPTH);
+</code></pre>
+<p>这只解决位宽表达，非2的幂深度时还要检查计数/地址越界。generate if/for在elaboration时选择结构，条件应是相应允许的常量表达式；运行时if只能改变行为，不能创建新实例。</p>
+<p><strong>练习：</strong> NUM_SUBCH=1时，原参考项目中硬编码访问subchannel1的代码是否仍安全？参数化声明不证明所有使用点都正确，要检查generate条件和索引。</p>
+<h2 id="19-文件io与外部pattern">19. 文件I/O与外部Pattern</h2>
+<p><code>$fopen</code>可能失败；读入时检查返回字段数量。不要只用 <code>$feof</code>作为唯一循环依据，因为一次读取失败不一定是有效EOF数据，错误格式也需要处理。</p>
+<pre><code class="language-systemverilog">// 教学片段：声明fd/rc/address/data后使用
+fd=$fopen(&quot;pattern.txt&quot;,&quot;r&quot;);
+if (fd==0) $fatal(1,&quot;cannot open pattern&quot;);
+while (!$feof(fd)) begin
+  rc=$fscanf(fd,&quot;%h %h&quot;,address,data);
+  if (rc==2) begin /* 消费一条完整记录 */ end
+  else if (!$feof(fd)) $fatal(1,&quot;malformed record&quot;);
+end
+$fclose(fd);
+</code></pre>
+<p>真实格式可能需要逐行读取、跳过注释、检测范围、报告行号。导入Pattern之前先定义事务格式，别把“能解析文本”当成协议合法性检查。</p>
+<p><strong>练习：</strong> 增加缺一列、非法地址、空行、末尾无换行四种输入，规定各自接受还是失败。先设计格式契约，再写容错策略。</p>
+<h2 id="20-编译elaborate仿真失败怎么区分">20. 编译、elaborate、仿真失败怎么区分</h2>
+<p>找不到package通常是文件列表或import顺序；找不到include通常是include路径；unsupported可能是工具能力；elaboration出错可能是参数、端口、实例连接；运行到一半mismatch通常再查刺激、监视、模型和DUT。</p>
+<p>保留完整命令与第一个错误，后面上百条错误可能是第一个声明失败的连锁反应。不要在遇到unsupported时把checker删掉，只为让程序“运行”。</p>
+<p>工程至少固定：顶层、语言版本、文件顺序、宏、include路径、工具版本、seed、超时、退出码与产物路径。SystemVerilog标准的功能集合大于任何一个工具当前实现，语言正确性与可运行性需要分别证明。<a href="https://steveicarus.github.io/iverilog/usage/index.html">Icarus文档</a></p>
+<h2 id="21-超出入门rtltb的语言部分">21. 超出入门RTL/TB的语言部分</h2>
+<p>门级primitive、UDP、驱动强度、specify路径延迟、timing checks、SDF回标、config/library、受保护代码及DPI/VPI同样属于标准生态。它们不能被“会class和covergroup”覆盖。</p>
+<ul>
+<li>门级/SDF：学习目标是区分逻辑结果与延迟/时序检查；需要合适的门级网表、库、SDF和支持这些构造的工具。</li>
+<li>DPI：连接C/C++参考模型，要处理类型映射、数组、内存所有权、pure/context及调用约束。</li>
+<li>VPI/PLI：操作仿真对象、注册回调，比普通testbench更贴近仿真器接口。</li>
+<li>加密IP：能获取文件不代表开源仿真器能解密和执行。</li>
+</ul>
+<p>本篇在这些主题提供认知边界，详见验证篇进阶入口；没有制造“所有标准附录都已精通”的假象。当前重点仍是你要实际编写的采样器、checker、coverage和UVM环境。</p>
+<h2 id="22-综合复习与参考答案">22. 综合复习与参考答案</h2>
+<ol>
+<li><strong>enum+struct为何比多个平行变量清楚？</strong> 一笔事件的字段被绑定，类型可检查，传参更完整；但不能代替valid与合法性规则。</li>
+<li><strong>NBA为何不等于“下一拍更新”？</strong> 它通常在当前仿真时间的后续区域更新；下一拍才由下游时序采到的是另外一层概念。</li>
+<li><strong>用了automatic是否完全线程安全？</strong> 只保证相应局部存储独立，共享对象、全局变量和interface仍可竞争。</li>
+<li><strong>logic是否自动能发现X？</strong> 若后来转成bit、被通配匹配或二态模拟，信息仍可丢失；检查链条需完整保留。</li>
+<li><strong>coverage为0先改激励吗？</strong> 还应检查采样事件、valid、iff、类型转换、单位和collector是否真的实例化。</li>
+<li><strong>“编译通过”等于符合规范吗？</strong> 否；还需边界向量、checker敏感性、覆盖计划和协议需求追踪。</li>
+</ol>
+<p>接下来读 <a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">验证篇</a>，把这些基础用于class、随机、并发、SVA与covergroup，再进入 <a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html">UVM详解</a>。</p>
+<hr />
+<p><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">← 返回学习导航</a></p>
+</article><div class="doc-bottom"><a href="/sv-uvm/">← 返回学习目录</a><a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">实验源码 ↗</a></div></main></div><footer>ChenWellesCxy HUST · SV / UVM 学习笔记 <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">查看源码仓库 ↗</a></footer></body></html>

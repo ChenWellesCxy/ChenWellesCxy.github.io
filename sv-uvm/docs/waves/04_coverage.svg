@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="532" viewBox="0 0 1160 532">
+<rect width="100%" height="100%" fill="#101827"/>
+<style>text{font-family:monospace;fill:#e2e8f0;font-size:14px}.grid{stroke:#334155;stroke-width:1}</style>
+<text x="20" y="26">04: per-bank timing (NOP=0 ACT=1 RD=2 PRE=3) | measured VCD | time: ns</text>
+<path class="grid" d="M150.0,55 V512"/><text x="150.0" y="48">0</text>
+<path class="grid" d="M230.83333333333331,55 V512"/><text x="230.83333333333331" y="48">10</text>
+<path class="grid" d="M311.66666666666663,55 V512"/><text x="311.66666666666663" y="48">20</text>
+<path class="grid" d="M392.5,55 V512"/><text x="392.5" y="48">30</text>
+<path class="grid" d="M473.3333333333333,55 V512"/><text x="473.3333333333333" y="48">40</text>
+<path class="grid" d="M554.1666666666667,55 V512"/><text x="554.1666666666667" y="48">50</text>
+<path class="grid" d="M635.0,55 V512"/><text x="635.0" y="48">60</text>
+<path class="grid" d="M715.8333333333334,55 V512"/><text x="715.8333333333334" y="48">70</text>
+<path class="grid" d="M796.6666666666666,55 V512"/><text x="796.6666666666666" y="48">80</text>
+<path class="grid" d="M877.5,55 V512"/><text x="877.5" y="48">90</text>
+<path class="grid" d="M958.3333333333334,55 V512"/><text x="958.3333333333334" y="48">100</text>
+<path class="grid" d="M1039.1666666666665,55 V512"/><text x="1039.1666666666665" y="48">110</text>
+<path class="grid" d="M1120.0,55 V512"/><text x="1120.0" y="48">120</text>
+<text x="12" y="85">clk</text>
+<path d="M150.0,92 H190.41666666666666" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M190.41666666666666,68 H230.83333333333331" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M190.41666666666666,92 V68" stroke="#5eead4"/>
+<path d="M230.83333333333331,92 H271.25" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M230.83333333333331,68 V92" stroke="#5eead4"/>
+<path d="M271.25,68 H311.66666666666663" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M271.25,92 V68" stroke="#5eead4"/>
+<path d="M311.66666666666663,92 H352.08333333333337" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M311.66666666666663,68 V92" stroke="#5eead4"/>
+<path d="M352.08333333333337,68 H392.5" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M352.08333333333337,92 V68" stroke="#5eead4"/>
+<path d="M392.5,92 H432.9166666666667" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M392.5,68 V92" stroke="#5eead4"/>
+<path d="M432.9166666666667,68 H473.3333333333333" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M432.9166666666667,92 V68" stroke="#5eead4"/>
+<path d="M473.3333333333333,92 H513.75" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M473.3333333333333,68 V92" stroke="#5eead4"/>
+<path d="M513.75,68 H554.1666666666667" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M513.75,92 V68" stroke="#5eead4"/>
+<path d="M554.1666666666667,92 H594.5833333333333" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M554.1666666666667,68 V92" stroke="#5eead4"/>
+<path d="M594.5833333333333,68 H635.0" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M594.5833333333333,92 V68" stroke="#5eead4"/>
+<path d="M635.0,92 H675.4166666666666" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M635.0,68 V92" stroke="#5eead4"/>
+<path d="M675.4166666666666,68 H715.8333333333334" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M675.4166666666666,92 V68" stroke="#5eead4"/>
+<path d="M715.8333333333334,92 H756.25" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M715.8333333333334,68 V92" stroke="#5eead4"/>
+<path d="M756.25,68 H796.6666666666666" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M756.25,92 V68" stroke="#5eead4"/>
+<path d="M796.6666666666666,92 H837.0833333333334" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M796.6666666666666,68 V92" stroke="#5eead4"/>
+<path d="M837.0833333333334,68 H877.5" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M837.0833333333334,92 V68" stroke="#5eead4"/>
+<path d="M877.5,92 H917.9166666666666" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M877.5,68 V92" stroke="#5eead4"/>
+<path d="M917.9166666666666,68 H958.3333333333334" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M917.9166666666666,92 V68" stroke="#5eead4"/>
+<path d="M958.3333333333334,92 H998.75" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M958.3333333333334,68 V92" stroke="#5eead4"/>
+<path d="M998.75,68 H1039.1666666666665" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M998.75,92 V68" stroke="#5eead4"/>
+<path d="M1039.1666666666665,92 H1079.5833333333335" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M1039.1666666666665,68 V92" stroke="#5eead4"/>
+<path d="M1079.5833333333335,68 H1120.0" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M1079.5833333333335,92 V68" stroke="#5eead4"/>
+<path d="M1120.0,92 H1120.0" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M1120.0,68 V92" stroke="#5eead4"/>
+<text x="12" y="139">rst_n</text>
+<path d="M150.0,146 H311.66666666666663" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M311.66666666666663,122 H1120.0" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M311.66666666666663,146 V122" stroke="#5eead4"/>
+<text x="12" y="193">cmd</text>
+<rect x="150.0" y="174" width="242.5" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="154.0" y="193">0x0</text>
+<rect x="392.5" y="174" width="161.66666666666674" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="396.5" y="193">0x1</text>
+<rect x="554.1666666666667" y="174" width="80.83333333333326" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="558.1666666666667" y="193">0x0</text>
+<rect x="635.0" y="174" width="80.83333333333337" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="639.0" y="193">0x2</text>
+<rect x="715.8333333333334" y="174" width="80.83333333333326" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="719.8333333333334" y="193">0x0</text>
+<rect x="796.6666666666666" y="174" width="80.83333333333337" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="800.6666666666666" y="193">0x2</text>
+<rect x="877.5" y="174" width="161.66666666666652" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="881.5" y="193">0x3</text>
+<rect x="1039.1666666666665" y="174" width="80.83333333333348" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="1043.1666666666665" y="193">0x0</text>
+<text x="12" y="247">bank</text>
+<path d="M150.0,254 H473.3333333333333" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M473.3333333333333,230 H554.1666666666667" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M473.3333333333333,254 V230" stroke="#5eead4"/>
+<path d="M554.1666666666667,254 H796.6666666666666" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M554.1666666666667,230 V254" stroke="#5eead4"/>
+<path d="M796.6666666666666,230 H877.5" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M796.6666666666666,254 V230" stroke="#5eead4"/>
+<path d="M877.5,254 H958.3333333333334" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M877.5,230 V254" stroke="#5eead4"/>
+<path d="M958.3333333333334,230 H1039.1666666666665" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M958.3333333333334,254 V230" stroke="#5eead4"/>
+<path d="M1039.1666666666665,254 H1120.0" fill="none" stroke="#5eead4" stroke-width="2"/>
+<path d="M1039.1666666666665,230 V254" stroke="#5eead4"/>
+<text x="12" y="301">cycle</text>
+<rect x="150.0" y="282" width="202.08333333333337" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="154.0" y="301">0x0</text>
+<rect x="352.08333333333337" y="282" width="80.83333333333331" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="356.08333333333337" y="301">0x1</text>
+<rect x="432.9166666666667" y="282" width="80.83333333333331" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="436.9166666666667" y="301">0x2</text>
+<rect x="513.75" y="282" width="80.83333333333326" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="517.75" y="301">0x3</text>
+<rect x="594.5833333333333" y="282" width="80.83333333333337" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="598.5833333333333" y="301">0x4</text>
+<rect x="675.4166666666666" y="282" width="80.83333333333337" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="679.4166666666666" y="301">0x5</text>
+<rect x="756.25" y="282" width="80.83333333333337" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="760.25" y="301">0x6</text>
+<rect x="837.0833333333334" y="282" width="80.83333333333326" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="841.0833333333334" y="301">0x7</text>
+<rect x="917.9166666666666" y="282" width="80.83333333333337" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="921.9166666666666" y="301">0x8</text>
+<rect x="998.75" y="282" width="80.83333333333348" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="1002.75" y="301">0x9</text>
+<rect x="1079.5833333333335" y="282" width="40.416666666666515" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="1083.5833333333335" y="301">0xa</text>
+<text x="12" y="355">delta_cycles</text>
+<rect x="150.0" y="336" width="525.4166666666666" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="154.0" y="355">0x0</text>
+<rect x="675.4166666666666" y="336" width="161.66666666666674" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="679.4166666666666" y="355">0x3</text>
+<rect x="837.0833333333334" y="336" width="282.91666666666663" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="841.0833333333334" y="355">0x4</text>
+<text x="12" y="409">boundary</text>
+<rect x="150.0" y="390" width="525.4166666666666" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="154.0" y="409">0x0</text>
+<rect x="675.4166666666666" y="390" width="444.58333333333337" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="679.4166666666666" y="409">0x1</text>
+<text x="12" y="463">above</text>
+<rect x="150.0" y="444" width="687.0833333333334" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="154.0" y="463">0x0</text>
+<rect x="837.0833333333334" y="444" width="282.91666666666663" height="28" fill="#1e3a5f" stroke="#93c5fd"/>
+<text x="841.0833333333334" y="463">0x1</text>
+</svg>

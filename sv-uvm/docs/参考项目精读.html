@@ -1,0 +1,320 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>参考项目精读：把 LPDDR6 命令采样代码读成 SystemVerilog | ChenWellesCxy HUST</title><meta name="description" content="SV / UVM 学习教程、实验与 CoverageModel 实践。"><link rel="canonical" href="https://chenwellescxy.github.io/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html"><link rel="stylesheet" href="/site-shell.css"><link rel="stylesheet" href="/sv-uvm/style.css"></head><body><a class="skip" href="#content">跳到内容</a><header class="cw-site-header"><div class="cw-bar"><a class="cw-brand" href="/">ChenWellesCxy <span>HUST</span></a><nav class="cw-links" aria-label="网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><details class="cw-mobile"><summary>导航</summary><nav aria-label="手机网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></details></div></header><div class="reader"><aside><a class="back" href="/sv-uvm/">← SV / UVM 学习目录</a><details open><summary>本页章节</summary><nav aria-label="本页章节"><a href="#0-文件在哪体量有多大">0. 文件在哪，体量有多大</a><a href="#1-先建立-sv-概念地图">1. 先建立 SV 概念地图</a><a href="#2-从引脚到-coverage跟踪一条命令的链路">2. 从引脚到 coverage：跟踪一条命令的链路</a><a href="#3-package先掌握类型不要硬背每个-mr-case">3. package：先掌握类型，不要硬背每个 MR case</a><a href="#4-认真读一个命令-covergroup">4. 认真读一个命令 covergroup</a><a href="#5-timing-conditions-includegenerated-code-的读法">5. Timing conditions include：generated code 的读法</a><a href="#6-interface-读码路径从小块开始">6. interface 读码路径：从小块开始</a><a href="#7-逐级动手练习与验收标准">7. 逐级动手练习与验收标准</a><a href="#8-波形应该看什么">8. 波形应该看什么</a><a href="#9-自测题">9. 自测题</a><a href="#10-readme-与完整工程的关系">10. README 与完整工程的关系</a></nav></details><details><summary>其他文档</summary><nav aria-label="专题文档"><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a><a href="/sv-uvm/docs/SV%E6%95%99%E7%A8%8B.html">从 Pattern 到 SystemVerilog</a><a href="/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html">UVM 入门教程</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html">SV 语言基础详解</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">SV 验证主题详解</a><a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html">UVM 官方资料详解</a><a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html">独立实现 CoverageModel</a><a href="/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html" aria-current="page">参考项目精读</a><a href="/sv-uvm/labs/03_uvm/README.html">UVM 简化存储器实验</a><a href="/sv-uvm/docs/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5.html">开源项目实践</a><a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html">免费 SV/UVM 环境选型</a><a href="/sv-uvm/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.html">环境与验证记录</a><a href="/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html">学习资源调研</a></nav></details></aside><main id="content"><div class="doc-top"><div class="eyebrow">SV / UVM · 动手实践</div><h1>参考项目精读：把 LPDDR6 命令采样代码读成 SystemVerilog</h1><div class="source">项目文档快照 · 2026-10-21 · <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning/blob/f09cfdaf87f25dce129bcc9a6b7c7824387e9d4b/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.md">查看原文 ↗</a></div></div><article><p>这份讲义带你读指定的 LPDDR6 coverage 生成结果，把它当作 SV 结构与代码阅读练习；最终目标是能从权威需求出发，独立设计并实现自己的 CoverageModel，而不是把他人实现当规范照搬。你已有两年 DRAM/FineSim 经验，读代码时可以把 CA 命令、sub-channel、MR 和 timing rule 当作熟悉的业务背景；重点放在 SV 如何把引脚变化整理成结构化事件，再由事件驱动状态更新和功能覆盖率。独立实现路线见 <a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html">独立实现 CoverageModel</a>。</p>
+<blockquote>
+<p>阅读范围是生成结果中的三个核心 SV 文件：<code>lpddr6_sample_pkg.sv</code>、<code>lpddr6_if_config_sampling.sv</code>、<code>lpddr6_timing_coverage.sv</code>，并重点追踪 <code>lpddr6_coverage_command.svh</code> 与 <code>lpddr6_coverage_timing_conditions.svh</code>。这些是已有工程文件，不代表它们单独构成一个可运行的仿真工程。本讲义只分析代码，不声称已编译或运行该项目。</p>
+</blockquote>
+<h2 id="0-文件在哪体量有多大">0. 文件在哪，体量有多大</h2>
+<p>以下路径相对于学习工作目录 <code>D:\\cxy\\SV&amp;UVM Learning</code>；行数按当前文件的实际文本行计（包含空行）：</p>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th style="text-align:right">行数</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RefProject/CoverageModel/lp6_new_old_ontology_sv_generator_20260901/lp6_new_old_ontology_sv_generator_20260901/新版/SV文件/lpddr6_sample_pkg.sv</code></td>
+<td style="text-align:right">387</td>
+<td>枚举、结构体、类型和初始化函数</td>
+</tr>
+<tr>
+<td>同目录 <code>lpddr6_if_config_sampling.sv</code></td>
+<td style="text-align:right">61,379</td>
+<td>interface、引脚采样、命令解码、协议状态/timing 派生采样</td>
+</tr>
+<tr>
+<td>同目录 <code>lpddr6_timing_coverage.sv</code></td>
+<td style="text-align:right">16</td>
+<td>引入各 coverage include 的薄 wrapper module</td>
+</tr>
+<tr>
+<td>同目录 <code>lpddr6_coverage_command.svh</code></td>
+<td style="text-align:right">185</td>
+<td>按 sub-channel 采样命令、地址和 BG/BA 覆盖</td>
+</tr>
+<tr>
+<td>同目录 <code>lpddr6_coverage_timing_conditions.svh</code></td>
+<td style="text-align:right">11,572</td>
+<td>由 timing 条件生成的大量 covergroup</td>
+</tr>
+</tbody>
+</table>
+<p>interface 超过 8 MB，flatten 辅助文件约 8 MB，timing rules include 超过 1.6 MB。不要从第一行通读几十万行；先读本讲义标出的窄窗口，然后按“类型 → 采样 → 解码 → 事件 → 覆盖”追踪。生成文件里重复结构很多，学习时要先找一个代表例子，弄懂模式再识别重复生成部分。</p>
+<p>路径中的中文目录名以及 interface 的 simulator 特性可能影响工具配置。代码包含多维 packed/unpacked 数组、interface、<code>realtime</code>、事件控制、<code>$isunknown</code>、<code>inside</code>、covergroup 和自动生成 include。编译需要兼容这些特性的 SystemVerilog 仿真器、完整依赖、正确编译顺序、include 路径及工程宏定义；这不等于仅安装 WSL 或 Icarus Verilog 就一定能运行。需要先从完整仓库的构建脚本确认目标仿真器和源文件顺序。</p>
+<h2 id="1-先建立-sv-概念地图">1. 先建立 SV 概念地图</h2>
+<table>
+<thead>
+<tr>
+<th>在参考代码里看到</th>
+<th>对应 SV 概念</th>
+<th>用工程语言理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>package ... endpackage</code></td>
+<td>package / 命名空间</td>
+<td>放公共类型和函数，避免 interface 与 coverage 各写一套命令类型</td>
+</tr>
+<tr>
+<td><code>typedef enum logic [...]</code></td>
+<td>枚举类型</td>
+<td>给命令编码加可读名字，例如 <code>CMD_ACT_2</code></td>
+</tr>
+<tr>
+<td><code>typedef struct { ... } name_t</code></td>
+<td>结构体</td>
+<td>把同一次命令的 valid、子通道、地址、时戳等信息打包</td>
+</tr>
+<tr>
+<td><code>function automatic</code></td>
+<td>自动函数</td>
+<td>组合计算/解码 helper；<code>automatic</code> 使局部变量每次调用独立</td>
+</tr>
+<tr>
+<td><code>interface</code></td>
+<td>接口</td>
+<td>集中封装 DUT/TB 信号和采样逻辑，可让外部模块用层次引用访问</td>
+</tr>
+<tr>
+<td><code>logic</code>、<code>bit</code>、<code>wire</code></td>
+<td>四态/二态变量、网络</td>
+<td><code>logic</code> 可表达 X/Z；<code>bit</code> 只有 0/1；<code>wire</code> 是连接网络</td>
+</tr>
+<tr>
+<td>packed <code>[N-1:0]</code> / unpacked <code>[N]</code> 数组</td>
+<td>位向量 / 元素数组</td>
+<td>比如 <code>logic [NUM_SUBCH-1:0][3:0] CA</code> 是每个 sub-channel 的 4 位 CA</td>
+</tr>
+<tr>
+<td><code>always @(posedge ...)</code></td>
+<td>事件控制过程</td>
+<td>输入边沿到来时执行；这里常用来收集总线相位</td>
+</tr>
+<tr>
+<td><code>event e; -&gt; e;</code></td>
+<td>命名事件声明/触发</td>
+<td>发布“命令采样完成”的通知，让依赖者在该时刻做事</td>
+</tr>
+<tr>
+<td><code>always_comb</code></td>
+<td>组合过程</td>
+<td>输出只由当前输入决定，例如镜像/别名信号</td>
+</tr>
+<tr>
+<td><code>case ... inside</code>、<code>inside {}</code></td>
+<td>集合/范围匹配</td>
+<td>对多个合法命令、范围做简洁判断</td>
+</tr>
+<tr>
+<td>非阻塞 <code>&lt;=</code> / 阻塞 <code>=</code></td>
+<td>更新调度差别</td>
+<td><code>&lt;=</code> 安排当前时间步稍后更新；<code>=</code> 立即更新当前过程变量</td>
+</tr>
+<tr>
+<td><code>covergroup</code> / <code>coverpoint</code> / <code>bins</code></td>
+<td>功能覆盖率模型</td>
+<td>记录仿真实际观察到哪些场景，不是断言，不会自动施加激励</td>
+</tr>
+<tr>
+<td><code>iff (condition)</code></td>
+<td>覆盖采样门控</td>
+<td>条件不成立的样本不计入该 coverpoint 的覆盖率</td>
+</tr>
+<tr>
+<td><code>cross A, B</code></td>
+<td>交叉覆盖</td>
+<td>记录 A 与 B 的 bin 组合是否出现</td>
+</tr>
+<tr>
+<td><code>generate for</code></td>
+<td>elaboration 时复制结构</td>
+<td>为每个 sub-channel 静态建立独立采样过程/状态</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-从引脚到-coverage跟踪一条命令的链路">2. 从引脚到 coverage：跟踪一条命令的链路</h2>
+<p>先看 interface 端口与局部状态：<code>lpddr6_if_config_sampling.sv:3-32</code> 定义 <code>lpddr6_if</code>、<code>NUM_SUBCH</code>/<code>DQ_WIDTH</code> 参数、CK/CS/CA 等端口，并导入 package；第 45-86 行保存相位采样值、上一条命令、序列窗口、MR 存储和事件。可把这些变量看成采样器的“小型状态机记忆”。</p>
+<ol>
+<li><strong>记录物理采样点。</strong> interface 对 CK、CS、CA 的边沿过程把命令各相位和时间记下来。常见边沿过程位于约 <code>12386-12441</code>，真正完成组合/解码的主 CK 采样块从约 <code>12441</code> 开始。由于逻辑依赖 CK 相位、check-even 和协议模式，阅读时应配合整个 block 追踪，而不是只看单个 <code>always</code> 声明。</li>
+<li><strong>组装原始样本。</strong> <code>make_raw_sample(sc)</code> 位于 <code>4688-4706</code>，从保存的 <code>cs_r1_q</code>、<code>ca_r1_q</code>、<code>ca_f1_q</code>、<code>ca_r2_q</code>、相位时戳等构造 <code>lpddr6_raw_cmd_sample_t</code>。这一步仍然是“观测到的引脚片段”，尚未得到命令语义。</li>
+<li><strong>译码成结构化命令。</strong> <code>decode_lpddr6_command(sc, raw)</code> 从 <code>4899</code> 起，先通过 <code>lpddr6_cmd_event_zero()</code> 初始化，再填 <code>valid/subch/sc/raw/mode/timestamp</code> 等字段；例如 <code>4923-4928</code> 过滤非目标 rank，之后根据 raw CA 与协议状态识别命令。SV 的 struct 返回值让调用者收到一整个事务记录，而不是许多并行参数。</li>
+<li><strong>补足多周期命令。</strong> 主采样块约 <code>12522-12525</code> 调用 <code>make_raw_sample</code> 和 decoder；约 <code>12528-12542</code> 的 ACT_2 处理会从先前 ACT_1 事件补上 BG/BA/行地址高位。类似地，MRW_2 会从 MRW_1 补 MA 等信息（<code>12544-12552</code>）。这是序列上下文的用处：一个物理时点的 CA 片段未必能单独决定完整逻辑事务。</li>
+<li><strong>发布“已采样”事件。</strong> 有效命令赋给 <code>sampled_cmd_event[sc_g]</code> 后触发 <code>-&gt; command_sampled[sc_g]</code>（见 <code>12701-12703</code>；PDX 特殊发布路径在 <code>12348-12376</code>）。<code>event command_sampled [NUM_SUBCH]</code> 声明在 <code>4677-4681</code>。事件本身不携带 payload；payload 放在 interface 的 <code>sampled_cmd_event</code> 数组里，事件通知消费者可以读取新值。</li>
+<li><strong>两个消费者响应同一通知。</strong> 生成状态/timing 更新的过程在 <code>12730-12745</code> 以 <code>always @(command_sampled[sampled_sc_g])</code> 等待事件，然后根据 <code>sampled_cmd_event</code> 更新状态、时间差样本等。coverage 端的 covergroup 也以相同事件作为采样触发点，例如 <code>lpddr6_coverage_command.svh:2</code> 和 <code>:94</code>。这让两者使用同一命令边界，但要注意 SystemVerilog 调度：触发命名事件后，等待它的过程和 event-triggered covergroup 都会在当前时间步被唤醒；它们之间谁先执行没有可依赖的固定顺序。如果 coverpoint 读取由状态更新过程改写的 <code>.active</code>，就不能只凭同一事件假定读到更新后的状态。需要检查该状态是在事件之前已稳定，还是通过 clocking block、显式阶段事件/延迟或其他同步结构确保采样顺序；否则可能存在 race，仿真器或代码改动也可能改变结果。<code>sampled_cmd_event</code> 在 <code>-&gt; command_sampled</code> 之前赋值，因而直接读取命令 payload 有清晰的先后关系；派生状态则要单独核查。</li>
+<li><strong>记录覆盖结果。</strong> <code>lpddr6_timing_coverage.sv:3-14</code> 声明模块，导入同一个 package 并 include 命令、speed-grade、timing rules、MR values、timing conditions、forbidden coverage。include 里的 covergroup 构造时会创建实例，如命令 coverage 的 <code>:91</code> 附近实例化 SC0 group。仿真器在触发事件时自动对触发型 covergroup 采样。</li>
+</ol>
+<p>简化时序示意（概念图，代表一次命令的先后关系，不是从波形数据库导出的实测波形）：</p>
+<pre><code class="language-text">时间 ───────────────────────────────────────────────────────────────►
+CK/CA     [相位1 CA] [相位2 CA] [相位3 CA] [相位4 CA]
+采样器      保存 r1/f1    保存 r2/f2    make_raw_sample + decode
+命令事件                                           -&gt; command_sampled[sc]
+状态/timing                                          更新状态与间隔样本
+coverage                                           covergroup 自动采样
+</code></pre>
+<p>面试时可以用一句话讲清楚：<strong>interface 把多边沿 CA 转为 raw sample，decoder 转成命令 event；事件触发状态/timing 派生和 covergroup 采样。</strong> 随后再举 ACT_1/ACT_2 需要跨拍补全的例子，说明你理解了事务边界和协议上下文。</p>
+<h2 id="3-package先掌握类型不要硬背每个-mr-case">3. package：先掌握类型，不要硬背每个 MR case</h2>
+<p>打开 <code>lpddr6_sample_pkg.sv</code>：</p>
+<ul>
+<li><code>1-45</code>：包声明、<code>lpddr6_cmd_type_e</code> 和 burst-length / die-mode 枚举。CMD enum 把 7 位数值映射为 <code>CMD_ACT_1</code>、<code>CMD_RD_S</code> 等语义名。枚举变量底层仍是逻辑向量，但编译器能帮你在类型和名字层面保持一致。</li>
+<li><code>47-185</code>：多个 MR 相关 <code>function automatic</code>，例如 <code>lpddr6_mr_fsp_mask</code>（<code>47-80</code>）根据地址返回掩码。学习重点是函数输入、返回类型、<code>case</code> 与 default；地址表本身按需查，不必背下来。</li>
+<li><code>187-247</code>：命令结构体 <code>lpddr6_cmd_event_t</code> 的声明结束行是 <code>247</code>。它是项目的关键“消息格式”。可搜索该 typedef 起始行和字段：字段名一眼能看出它同时携带身份、地址、属性、原始样本与时间信息。</li>
+<li><code>249-286</code>：<code>lpddr6_cmd_event_zero()</code> 给 struct 建立已知缺省值。这样 decoder 开始时不会遗留上次调用的数据，也让默认命令明确是 UNKNOWN/invalid。</li>
+<li><code>288-385</code>：state、timing start/interval sample、command pair 和 tuple3 等结构，以及对应 <code>_zero()</code> 初始化 helper。它们告诉你模型不仅看单条命令，也会保存进入/退出状态、开始/结束事件、上一条与当前命令、三条命令窗口。</li>
+<li><code>387</code>：package 结束。</li>
+</ul>
+<p>适合练习的改读问题：<code>CMD_ACT_1</code> 和 <code>CMD_ACT_2</code> 为什么要在事件结构里存行/银行字段？<code>lpddr6_cmd_event_zero()</code> 把哪些字段设成“无效/未知”？回答前请先定位实际字段，不要根据命令直觉猜代码。</p>
+<h2 id="4-认真读一个命令-covergroup">4. 认真读一个命令 covergroup</h2>
+<p><code>lpddr6_coverage_command.svh</code> 按物理 sub-channel 生成两套近似对称的组：SC0 <code>:2-91</code>，SC1 <code>:94-169</code>。取 SC0 为例：</p>
+<ul>
+<li><code>:2</code> 的 <code>@(vif.command_sampled[0])</code> 表示该 covergroup 在 SC0 的命令事件发生时采样。</li>
+<li><code>:6-35</code> 的命令类型 coverpoint 根据 <code>sampled_cmd_event[0].valid</code> 门控，并用不同 bins 表示 CMD 类别；看这个小区域能练 enum、coverpoint、显式 bins。</li>
+<li><code>:38-62</code> 覆盖需要 bank 地址的命令及 <code>{bg, ba}</code> 组合。条件特意把普通 ACT/RD/WR 与非 all-bank PRE/REFRESH 分开，说明 coverpoint 只在 bank 字段有意义的命令上统计。</li>
+<li><code>:64-69</code> 只在 <code>CMD_ACT_2</code> 时采集 row；<code>:71-81</code> 只在 RD/WR 命令时采集 column。不同地址字段有不同有效命令集合，这比把每条命令硬塞进一个大地址覆盖点更清楚。</li>
+<li><code>:83-85</code> 是命令与 BG/BA、row、column 的 cross；<code>:87-91</code> 覆盖 sub-channel 字段。SC1 的 <code>:96-169</code> 重复同一模型并对 <code>[1]</code> 采样。</li>
+</ul>
+<h3 id="iff-到底做什么"><code>iff</code> 到底做什么</h3>
+<p>例如 <code>:64-69</code> 的 <code>iff (valid &amp;&amp; cmd_type == CMD_ACT_2)</code> 是 coverpoint 的采样条件。条件为 0 时，这次触发不会增加该 coverpoint 任一 bin；它不会停止 decoder，也不会断言“出现其他命令就是错误”。<code>iff</code> 常用于“字段仅在某类命令有意义”的场景。</p>
+<p>区别记忆：covergroup 行的 <code>@(event)</code> 决定<strong>何时尝试采样</strong>；coverpoint 的 <code>iff</code> 决定<strong>这个字段本次是否计入覆盖</strong>。断言（assert property）才用于检查时序/逻辑是否违反要求；coverpoint 不会让仿真失败。</p>
+<h3 id="cross-在量什么"><code>cross</code> 在量什么</h3>
+<p><code>x_cmd_col: cross cp_cmd_col, cp_col</code>（<code>:85</code>）要求记录命令类型 bin 与列地址 bin 的组合。单看 <code>cp_cmd_col</code>，可能所有六类 RD/WR 都出现过；单看 <code>cp_col</code>，也可能所有 column bin 都覆盖了；cross 才能暴露例如“某一种写命令从未访问某段 column”的缺口。</p>
+<p>组合数量会相乘：<code>cp_cmd_col</code> 六个 bins、<code>cp_col</code> 八个 bins，理论上至多 48 个组合（还会受 <code>iff</code>、非法/不可达值、工具的 ignore/illegal bins 影响）。这里 row 有 16 个 bins，而 row 原始范围是 17 位全范围；不是每一个地址都单独成 bin。BG/BA 是 <code>{bg, ba}</code> 拼接得到 4 位 coverpoint，<code>bins bgba[] = {[4'h0:4'hf]}</code> 将 16 个值拆成自动命名的 bins。</p>
+<p>观察提醒：检查 coverpoint 与 cross 的 <code>iff</code> 是否形成预期的有效采样组合；不能只因 coverage 百分比升高就推断协议正确。</p>
+<h2 id="5-timing-conditions-includegenerated-code-的读法">5. Timing conditions include：generated code 的读法</h2>
+<p>打开 <code>lpddr6_coverage_timing_conditions.svh:1-50</code>，第一组名为 <code>cg_timing_symbol_conditions_bl_n_sc0</code>，由 <code>@(vif.command_sampled[0])</code> 触发；每个 coverpoint 对某个 state 的 <code>.active</code> 做采样，并过滤 DFT/CBT（<code>iff (!vif.is_dft[0] &amp;&amp; !vif.is_cbt[0])</code>）。<code>option.per_instance = 1</code> 与 <code>option.name</code> 设置实例覆盖信息。后续 <code>:52</code> 开始 SC1 对应组，后面按 timing parameter 与模式组合继续生成；<code>lpddr6_timing_coverage.sv:13</code> 引入整个 include。</p>
+<p>这里有个重要的 code-reading 判断：该文件是生成结果，变量名、注释与重复的 <code>cp_value__N</code> 是 generator 的产物。像 <code>:10-47</code> 多个 point 使用相同的 <code>.active</code> 表达式、但注释的 value 标签重复/变化，仅凭名字不能证明它们分别代表独立且有意义的条件。学习者可以从中学 covergroup 语法，但若要 review coverage 语义，应回到 generator 输入（README 指向 ontology 的 <code>timing_parameters.yaml</code> 等定义）与生成策略，检查每个点/ bin 是否确实区分了预期条件。不要直接把生成文件某个名字当作协议规范。</p>
+<p>与 command group 的差异：command group 覆盖“发生了哪种事务、地址落在哪里”；timing-conditions group 覆盖“当时模型状态/配置条件是否处于某种组合”。它们都以命令事件为采样节拍，但采样的数据源不同。</p>
+<h2 id="6-interface-读码路径从小块开始">6. interface 读码路径：从小块开始</h2>
+<table>
+<thead>
+<tr>
+<th>行号窗口</th>
+<th>建议带着什么问题读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lpddr6_if_config_sampling.sv:3-43</code></td>
+<td>参数、端口、类型包依赖和 elaboration 检查是什么？<code>NUM_SUBCH</code> 与 DQ width 被限制为多少？</td>
+</tr>
+<tr>
+<td><code>:45-100</code></td>
+<td>哪些变量是历史记忆？数组维度分别表示 sub-channel、MR 地址还是序列窗口？</td>
+</tr>
+<tr>
+<td><code>:4630-4675</code></td>
+<td>typedef struct 的 rate result 怎样初始化、<code>case inside</code> 如何处理 period？特别检查 default path 的行为和注释。</td>
+</tr>
+<tr>
+<td><code>:4677-4706</code></td>
+<td>命名事件怎样声明？raw sample 从哪些寄存/临时量组装？</td>
+</tr>
+<tr>
+<td><code>:4899-4935</code></td>
+<td>decoder 怎样初始化返回值、设置 mode/time、过滤目标 rank/特殊场景？</td>
+</tr>
+<tr>
+<td><code>:12441-12552</code></td>
+<td>采样时如何调用 decoder，并在 ACT_2/MRW_2 补上前一相位信息？</td>
+</tr>
+<tr>
+<td><code>:12701-12745</code></td>
+<td>sampled event 在什么时候赋值/触发？哪个 always block 等待事件？</td>
+</tr>
+<tr>
+<td><code>:60284-60427</code></td>
+<td>任选一个 timing 计算函数，梳理参数、单位、返回 struct 和边界条件。</td>
+</tr>
+<tr>
+<td><code>:61305</code></td>
+<td>VCD flatten helper 从何处 include；它是接口展开辅助层，不是命令 decoder 本身。</td>
+</tr>
+</tbody>
+</table>
+<p>行号按当前提供的文件版本；如果该目录下 SV 文件更新，行号可能变化。通常在 PowerShell 用 <code>Select-String -Pattern</code> 或编辑器“转到行”定位。</p>
+<h2 id="7-逐级动手练习与验收标准">7. 逐级动手练习与验收标准</h2>
+<p>以下练习只要求阅读/纸面推演，不修改项目参考源。若之后要做可运行练习，应另建小型 sandbox，先确认仿真器与开源环境，再移植极小子集。</p>
+<p><strong>练习 A：类型阅读（20–30 分钟）</strong></p>
+<ol>
+<li>在 package 找到 <code>lpddr6_cmd_type_e</code>、<code>lpddr6_cmd_event_t</code>、raw sample 类型和 zero helper。</li>
+<li>画出 <code>raw sample → command event</code> 字段映射，至少列 valid、subch、CA 原始片段、cmd_type、时间戳。</li>
+<li>用自己的话解释 enum、struct 和 <code>automatic function</code> 的作用。</li>
+</ol>
+<p>验收：能说明“raw 样本是引脚观测，event 是语义化命令”；能指出 invalid/unknown 默认值从哪初始化，而不是把两种结构混为一谈。</p>
+<p><strong>练习 B：读一条两拍命令（30–45 分钟）</strong></p>
+<ol>
+<li>从 <code>decode_lpddr6_command</code> 里定位 ACT_1/ACT_2 的识别分支。</li>
+<li>跟到主采样块的 ACT_2 补齐逻辑，解释缺失 <code>act_1_event_valid</code> 时为何 <code>decoded.valid</code> 会清零。</li>
+<li>写 5–8 行伪代码表达：采样相位 → raw → decode → 补齐 → publish。</li>
+</ol>
+<p>验收：能清楚区分边沿采样、命令译码和协议序列重建三个阶段；知道 event 触发在 payload 赋值之后。</p>
+<p><strong>练习 C：覆盖率语义（30 分钟）</strong></p>
+<ol>
+<li>对照 <code>lpddr6_coverage_command.svh:64-85</code> 解释 row、column、BG/BA 的 iff。</li>
+<li>画一个 6（命令类型）×8（列地址分箱）的覆盖矩阵，标出已覆盖组合。</li>
+<li>说明 covergroup event、coverpoint iff、cross 各解决哪个问题，并说明它们不负责什么。</li>
+</ol>
+<p>验收：能正确指出 coverpoint 记录观察结果、不产生激励；能指出 <code>iff</code> 为假只跳过对应 coverage sample；能举例解释 cross 如何发现单维 coverage 看不到的空洞。</p>
+<p><strong>练习 D：小型独立复现（建议另建目录，不动参考工程）</strong></p>
+<p>只仿写抽象模型：枚举 3 种命令、一个 <code>struct</code> transaction、一个事件、一个命令 covergroup（命令 bins + 地址 bins + cross），驱动几组 transaction，导出 coverage。让仿真器生成 VCD/FST，再用 GTKWave 查看 <code>cmd_valid</code>、<code>cmd_type</code>、<code>address</code>、<code>sample_event</code> 的时间对应。</p>
+<p>验收：仿真日志和波形都能说明每个 transaction 只在预期事件点被覆盖；覆盖报告能指出漏掉的组合。请把独立练习与 reference generator 输出区分开，避免“能跑玩具模型”被误说成“跑通完整 LPDDR6 coverage 工程”。</p>
+<p><strong>练习 E：面试讲解（5 分钟）</strong></p>
+<p>不看讲义，画出输入端口、采样器、decoder、命令 event、状态/timing 更新、covergroup 的数据流；然后用 ACT_1/ACT_2 或 MRW_1/MRW_2 讲一次跨拍补齐。验收：能从引脚采样一直讲到 coverage，而不只介绍 <code>covergroup</code> 语法。</p>
+<h2 id="8-波形应该看什么">8. 波形应该看什么</h2>
+<p>完整参考项目波形是否可用取决于其 testbench、仿真器和 dump 配置，本讲义没有生成波形。学习小练习可以用下面的信号清单绘制/检查真实波形：</p>
+<table>
+<thead>
+<tr>
+<th>波形信号</th>
+<th>要确认的关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CK_t[sc]</code>, <code>CS[sc]</code>, <code>CA[sc]</code></td>
+<td>CA 相位确实在采样边沿满足 stimulus 设置的时序</td>
+</tr>
+<tr>
+<td><code>ca_r1_q/ca_f1_q/ca_r2_q/ca_f2_q</code></td>
+<td>采样器记录的片段与引脚值一致</td>
+</tr>
+<tr>
+<td><code>sampled_cmd_event[sc].valid/cmd_type</code></td>
+<td>decoder 只在命令构成完整后产生有效类型</td>
+</tr>
+<tr>
+<td><code>sampled_cmd_event[sc].r/bg/ba/c</code></td>
+<td>解出的地址与驱动场景一致，跨拍字段没有丢失</td>
+</tr>
+<tr>
+<td><code>command_sampled[sc]</code></td>
+<td>一个命令只在预期边界触发一次通知</td>
+</tr>
+<tr>
+<td>对应状态 <code>.active</code></td>
+<td>命令事件之后，状态按预期进入或退出</td>
+</tr>
+<tr>
+<td>coverage report</td>
+<td>wave 上出现的事件与命令 bins/cross hits 可对应</td>
+</tr>
+</tbody>
+</table>
+<p>入门时先用小模型把波形概念跑通，再读这个全量 generator 输出。波形能证明“仿真中观察到了什么”，不能单独证明所有协议行为都正确；应将波形、断言/检查器结果和覆盖率报告结合起来。</p>
+<h2 id="9-自测题">9. 自测题</h2>
+<ol>
+<li>为什么 covergroup 的事件触发和 coverpoint 的 <code>iff</code> 是两层判断？</li>
+<li>一个命令类型覆盖率 100%，但 command×column cross 不满，说明什么？</li>
+<li><code>decode_lpddr6_command</code> 返回的 event 为什么要带 raw 和 timestamp？</li>
+<li>ACT_2 为什么可能因缺少 ACT_1 上下文而被标为 invalid？</li>
+<li><code>lpddr6_timing_coverage.sv</code> 为什么短，但能决定覆盖模型组成？</li>
+<li>看到 generated coverpoint 名叫某条 timing rule，哪些证据还能帮助确认其 coverage 实际意义？</li>
+</ol>
+<p>建议答案要点：触发条件确定采样时点、iff 决定某字段是否统计；cross 找组合空洞；raw/time 用于追溯与时序计算；两拍协议需重建完整命令；wrapper 通过 include 组合 coverage 模块；要追溯生成输入、策略、展开状态和 bins，而非只读名字。</p>
+<h2 id="10-readme-与完整工程的关系">10. README 与完整工程的关系</h2>
+<p>同级 generator README：<code>RefProject/CoverageModel/lp6_new_old_ontology_sv_generator_20260901/lp6_new_old_ontology_sv_generator_20260901/新版/生成器/README.md:1-33</code> 说明 ontology 会生成 sampling interface 和 coverage model，并列出 <code>--stages all</code>、ontology、输出目录参数及主要产物。README 给的是生成器使用方式，不是这几个 SV 文件的独立仿真说明。要运行完整输出，还需要仓库所述 ontology 输入、生成器、template、对应 TB/top、构建命令以及有支持的商业/开源 simulator；请先从完整项目的 build/test setup 核验，不要从 <code>README</code> 的 Python generator 命令推断 SV 仿真已经可运行。</p>
+<p>本项目学习价值很高：对熟悉 DRAM 的工程师来说，它把“命令引脚译码 + 协议状态 + 条件覆盖”放在可追踪的 SV 代码里。学习时抓住数据流和一两个代表 covergroup；庞大的自动生成展开部分应当当作检索对象，而非初学者逐行精读教材。</p>
+<hr />
+<p><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">← 返回学习导航</a></p>
+</article><div class="doc-bottom"><a href="/sv-uvm/">← 返回学习目录</a><a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">实验源码 ↗</a></div></main></div><footer>ChenWellesCxy HUST · SV / UVM 学习笔记 <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">查看源码仓库 ↗</a></footer></body></html>

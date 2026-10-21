@@ -1,0 +1,499 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UVM 官方资料详解：从 FineSim 验证走到可复用验证环境 | ChenWellesCxy HUST</title><meta name="description" content="SV / UVM 学习教程、实验与 CoverageModel 实践。"><link rel="canonical" href="https://chenwellescxy.github.io/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html"><link rel="stylesheet" href="/site-shell.css"><link rel="stylesheet" href="/sv-uvm/style.css"></head><body><a class="skip" href="#content">跳到内容</a><header class="cw-site-header"><div class="cw-bar"><a class="cw-brand" href="/">ChenWellesCxy <span>HUST</span></a><nav class="cw-links" aria-label="网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><details class="cw-mobile"><summary>导航</summary><nav aria-label="手机网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></details></div></header><div class="reader"><aside><a class="back" href="/sv-uvm/">← SV / UVM 学习目录</a><details open><summary>本页章节</summary><nav aria-label="本页章节"><a href="#官方资料的边界">官方资料的边界</a><a href="#1-uvm-的核心标准化可组合的验证组件">1. UVM 的核心：标准化可组合的验证组件</a><a href="#2-uvm_object-和-uvm_component数据对象与层级对象">2. uvm_object 和 uvm_component：数据对象与层级对象</a><a href="#3-class-handle对象别名与事务快照">3. Class handle、对象别名与事务快照</a><a href="#4-copyclonecompare对象操作不是魔法">4. copy、clone、compare：对象操作不是魔法</a><a href="#5-field-macros-与-do_-hook自动化和显式控制">5. Field macros 与 do_* hook：自动化和显式控制</a><a href="#6-packunpackprintrecord序列化与可观测性">6. Pack、unpack、print、record：序列化与可观测性</a><a href="#7-factory创建类型与实际实例解耦">7. Factory：创建类型与实际实例解耦</a><a href="#8-type-overrideinstance-override-与优先级">8. Type override、instance override 与优先级</a><a href="#9-config-db按层级查配置">9. Config DB：按层级查配置</a><a href="#10-tlm-1portexportimp-与类型化连接">10. TLM-1：port、export、imp 与类型化连接</a><a href="#11-analysis-port零时间广播与-handle-所有权">11. Analysis port：零时间广播与 handle 所有权</a><a href="#12-tlm-fifo把方法调用缓冲为队列">12. TLM FIFO：把方法调用缓冲为队列</a><a href="#13-tlm-2知道边界不与-tlm-1-混为一谈">13. TLM-2：知道边界，不与 TLM-1 混为一谈</a><a href="#14-uvm-phases建树连接运行收尾">14. UVM phases：建树、连接、运行、收尾</a><a href="#15-objectiontask-phase-的完成条件">15. Objection：task phase 的完成条件</a><a href="#16-sequencesequencerdriver-的握手">16. Sequence、sequencer、driver 的握手</a><a href="#17-并发仲裁prioritylock-与-grab">17. 并发仲裁、priority、lock 与 grab</a><a href="#18-responsetransaction-id-与-response-queue">18. Response、transaction ID 与 response queue</a><a href="#19-virtual-sequence跨多个-agent-编排">19. Virtual sequence：跨多个 agent 编排</a><a href="#20-reset区分协议重置sequence-中断与模型清理">20. Reset：区分协议重置、sequence 中断与模型清理</a><a href="#21-scoreboardreference-model定义事务关联再比较">21. Scoreboard/reference model：定义事务关联再比较</a><a href="#22-outstanding-管理与仿真结束条件">22. Outstanding 管理与仿真结束条件</a><a href="#23-reportingseverityidverbosity-与可复现日志">23. Reporting：severity、ID、verbosity 与可复现日志</a><a href="#24-callback-与-report-catcher扩展点不要隐藏主流程">24. Callback 与 report catcher：扩展点，不要隐藏主流程</a><a href="#25-functional-coveragecovergroup-的采样语义">25. Functional coverage：covergroup 的采样语义</a><a href="#26-ral-概念registerfieldfrontdoorbackdoor">26. RAL 概念：register、field、frontdoor/backdoor</a><a href="#27-ral-desiredmirrorreadpredict">27. RAL desired、mirror、read、predict</a><a href="#28-ral-adapter-与-predictor">28. RAL adapter 与 predictor</a><a href="#29-register-sequences-与访问策略">29. Register sequences 与访问策略</a><a href="#30-同步原语与队列eventmailboxsemaphoreprocess">30. 同步原语与队列：event、mailbox、semaphore、process</a><a href="#31-uvm-12-与-ieee-18002版本标准和实现">31. UVM 1.2 与 IEEE 1800.2：版本、标准和实现</a><a href="#32-调试沿最短数据链路逐层定位">32. 调试：沿最短数据链路逐层定位</a><a href="#33-把练习经验准确映射到-dram-验证岗位">33. 把练习经验准确映射到 DRAM 验证岗位</a><a href="#34-官方资料索引与读源码路线">34. 官方资料索引与读源码路线</a><a href="#35-最终自测题与参考要点">35. 最终自测题与参考要点</a><a href="#36-resource-db理解底层资源池与配置查找">36. Resource DB：理解底层资源池与配置查找</a></nav></details><details><summary>其他文档</summary><nav aria-label="专题文档"><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a><a href="/sv-uvm/docs/SV%E6%95%99%E7%A8%8B.html">从 Pattern 到 SystemVerilog</a><a href="/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html">UVM 入门教程</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html">SV 语言基础详解</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">SV 验证主题详解</a><a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html" aria-current="page">UVM 官方资料详解</a><a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html">独立实现 CoverageModel</a><a href="/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html">参考项目精读</a><a href="/sv-uvm/labs/03_uvm/README.html">UVM 简化存储器实验</a><a href="/sv-uvm/docs/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5.html">开源项目实践</a><a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html">免费 SV/UVM 环境选型</a><a href="/sv-uvm/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.html">环境与验证记录</a><a href="/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html">学习资源调研</a></nav></details></aside><main id="content"><div class="doc-top"><div class="eyebrow">SV / UVM · 深入理解</div><h1>UVM 官方资料详解：从 FineSim 验证走到可复用验证环境</h1><div class="source">项目文档快照 · 2026-10-21 · <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning/blob/f09cfdaf87f25dce129bcc9a6b7c7824387e9d4b/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.md">查看原文 ↗</a></div></div><article><p>这份教材面向已经做过 DRAM FineSim fullchip 验证、但 UVM 实战较少的工程师。目标是读懂 Accellera UVM 参考实现里的关键抽象，自己解释数据如何经过 sequence、sequencer、driver、DUT、monitor 和 scoreboard，并能识别真实项目中常见的配置、并发和数据一致性问题。</p>
+<p>文中总线例子仍是教学用存储器总线，不代表 DRAM 或 JEDEC 协议。所有 SV 代码都是<strong>解释概念的片段，未运行</strong>；省略了完整 package、interface、编译脚本和具体仿真器限制。能否编译取决于 SV 仿真器与 UVM 版本。实际使用时请以项目仿真器手册和仓库内实验为准。</p>
+<h2 id="官方资料的边界">官方资料的边界</h2>
+<p>Accellera UVM Core 是 IEEE 1800.2-2020 API 的 SystemVerilog 参考实现；它自己也说明实现有偏离项，并把 API 标记为 IEEE 标准 API、Accellera 扩展、兼容旧版本接口或库内部接口。某个方法在参考代码里能看到，不代表它一定是跨实现可移植的标准接口。<a href="https://github.com/accellera-official/uvm-core/blob/main/README.md">UVM Core README</a> · <a href="https://github.com/accellera-official/uvm-core/blob/main/DEVIATIONS.md">实现偏离说明</a></p>
+<p>Accellera 下载页同时列出 IEEE 1800.2 参考实现、UVM 1.2、UVM 1.2 User Guide 等资料。UVM 1.2 User Guide 仍适合学习基础方法论；API 细节和版本差异应再核对对应版本的 class reference 和实现源码。<a href="https://www.accellera.org/downloads/standards/uvm">Accellera 下载页</a> · <a href="https://www.accellera.org/images/downloads/standards/uvm/uvm_users_guide_1.2.pdf">UVM 1.2 User Guide</a></p>
+<p>章节编号是本教材自己的编号，不冒充官方手册章节号。按“对象数据 → 组件拓扑 → stimulus 与通信 → phase 生命周期 → 检查与覆盖 → 寄存器模型 → 工程落地”的顺序学习。</p>
+<h2 id="1-uvm-的核心标准化可组合的验证组件">1. UVM 的核心：标准化可组合的验证组件</h2>
+<p>UVM 不替你决定验证什么，也不会自动证明 DUT 正确。它提供常见结构和通信接口，让事务产生、接口驱动、行为观察、结果检查、覆盖采样和测试配置可以被拆开复用。验证目标仍来自规范、验证计划和设计风险。</p>
+<p>把 FineSim 工作映射过来：pattern 的一笔操作接近 transaction；pattern sequence 接近 UVM sequence；真正对引脚赋值的逻辑接近 driver；接口观察接近 monitor；expected value 与实际结果的比较接近 scoreboard/reference model。这是职责类比，不表示两种仿真流程内部实现相同。</p>
+<pre><code class="language-text">test -&gt; sequence -&gt; sequencer -&gt; driver -&gt; 接口 -&gt; DUT
+                                      DUT -&gt; 接口 -&gt; monitor -&gt; scoreboard
+                                                        └----&gt; coverage
+</code></pre>
+<p><strong>执行过程</strong>：test 选择环境与配置；sequence 生成操作；sequencer 在并发 sequence 之间仲裁；driver 执行协议；monitor 独立观察协议；scoreboard 根据观察到的事务更新模型并检查结果。</p>
+<p><strong>常见坑</strong>：把 UVM 当成必须照抄的模板；把规范检查全塞进 driver；用 sequence 自报的 expected 作为唯一检查来源；为简单设计拆出大量空壳组件。</p>
+<p><strong>练习与答案要点</strong>：画出你当前 FineSim 环境的数据流，标明 pattern、引脚控制、结果判断和波形观察职责。转写成 UVM 图时，不确定的内部职责标“待确认”，不要臆测。</p>
+<h2 id="2-uvm_object-和-uvm_component数据对象与层级对象">2. <code>uvm_object</code> 和 <code>uvm_component</code>：数据对象与层级对象</h2>
+<p><code>uvm_object</code> 是轻量对象基类，常用于 transaction、sequence、配置对象和寄存器模型对象；它不属于 component 树，不通过 phase 自动遍历。<code>uvm_component</code> 属于验证环境的层级树，拥有 parent/name、phase 回调和层级信息。test、env、agent、driver、monitor、scoreboard 通常是 component。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+class mem_item extends uvm_sequence_item;
+  `uvm_object_utils(mem_item)
+  rand bit write;
+  rand bit [7:0] addr;
+  rand bit [31:0] data;
+  function new(string name=&quot;mem_item&quot;); super.new(name); endfunction
+endclass
+
+class mem_monitor extends uvm_component;
+  `uvm_component_utils(mem_monitor)
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+endclass
+</code></pre>
+<p><strong>执行过程</strong>：item 可以大量创建和销毁；component 通常在 build 阶段创建一次并挂在 env 的命名层级中，例如 <code>uvm_test_top.env.mem_agent.monitor</code>。路径影响 config_db、factory instance override 和日志定位。</p>
+<p><strong>常见坑</strong>：把每笔 transaction 做成 component；在构造函数直接 <code>new</code> 组件而绕开 factory；忘记 component 构造函数传递 parent。</p>
+<p><strong>练习与答案要点</strong>：sequence 是 object 还是 component？它继承 <code>uvm_object</code>，由 sequencer 执行，但不是 component 树节点。driver 是 component，因为它拥有环境层级和 phase 生命周期。</p>
+<p>对照 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_object.svh"><code>uvm_object</code></a> 与 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_component.svh"><code>uvm_component</code></a>。</p>
+<h2 id="3-class-handle对象别名与事务快照">3. Class handle、对象别名与事务快照</h2>
+<p>SystemVerilog class 变量保存对象 handle，不是对象内容。赋值会复制 handle：</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+mem_item a = new(&quot;a&quot;);
+mem_item b;
+b = a;              // b 与 a 指向同一对象
+b.data = 'h55;      // a.data 也变成 'h55
+</code></pre>
+<p>monitor 若重复修改同一个 item 并反复 <code>ap.write(item)</code>，subscriber 可能保留相同 handle，之后看到的记录都变成最后一笔。稳妥做法是每笔采样创建新对象；若要保存已有对象，则明确复制策略。</p>
+<p><strong>执行过程</strong>：采样边沿 → 新建 item → 捕获 addr/op/data/response → 发布 → scoreboard 在 callback 中读取或 clone → 下一笔使用不同对象。Analysis write 不会自动冻结对象。</p>
+<p><strong>常见坑</strong>：以为赋值 handle 就复制；对象放进队列后立即修改；浅拷贝嵌套 class 后仍共享底层对象。</p>
+<p><strong>练习与答案要点</strong>：<code>a==b</code> 为真表示 handle 指向同一对象，不是字段逐项相等。字段相同比较用 <code>compare()</code> 或显式比较。</p>
+<h2 id="4-copyclonecompare对象操作不是魔法">4. <code>copy</code>、<code>clone</code>、<code>compare</code>：对象操作不是魔法</h2>
+<p><code>copy(rhs)</code> 把 rhs 状态复制到已存在的目标；<code>clone()</code> 新建合适类型对象并复制；<code>compare(rhs)</code> 检查字段。行为依赖 field automation、<code>do_copy</code>、<code>do_compare</code> 和嵌套对象复制策略。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+uvm_object raw;
+mem_item snapshot;
+raw = item.clone();
+if (!$cast(snapshot, raw)) `uvm_fatal(&quot;CAST&quot;, &quot;unexpected item type&quot;)
+if (!item.compare(snapshot)) `uvm_error(&quot;COPY&quot;, &quot;clone differs from source&quot;)
+</code></pre>
+<p><strong>执行过程</strong>：clone 构造目标对象并执行复制流程；compare 根据启用的字段比较内容。派生类新增字段后，应确认 copy 和 compare 一并覆盖。</p>
+<p><strong>常见坑</strong>：clone 返回基类 handle 后不 <code>$cast</code>；字段未纳入复制/比较；动态数组里的 class handle 只浅拷贝；比较了不该比较的 debug timestamp，却漏了返回状态或 mask。</p>
+<p><strong>练习与答案要点</strong>：transaction 新增动态 byte queue。复制时复制队列值；队列元素若是对象 handle，还要决定深拷贝；比较长度和每项内容。</p>
+<p>官方对象流程见 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_object.svh"><code>uvm_object.svh</code></a> 与 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_copier.svh"><code>uvm_copier.svh</code></a>。</p>
+<h2 id="5-field-macros-与-do_-hook自动化和显式控制">5. Field macros 与 <code>do_*</code> hook：自动化和显式控制</h2>
+<p><code>uvm_field_*</code> 宏可为注册字段提供打印、复制、比较、pack/unpack 等自动化，适合字段简单且语义明确的对象。复杂结构适合显式实现 <code>do_copy</code>、<code>do_compare</code>、<code>do_pack</code>、<code>do_unpack</code>、<code>do_print</code> 等 hook。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行：宏方式
+`uvm_object_utils_begin(mem_item)
+  `uvm_field_int(write, UVM_DEFAULT)
+  `uvm_field_int(addr,  UVM_DEFAULT)
+  `uvm_field_int(data,  UVM_DEFAULT)
+`uvm_object_utils_end
+</code></pre>
+<p>手动 hook 应先处理父类部分，再处理本类字段：</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+function void do_copy(uvm_object rhs);
+  mem_item other;
+  if (!$cast(other, rhs)) `uvm_fatal(&quot;COPY&quot;, &quot;type mismatch&quot;)
+  super.do_copy(rhs);
+  write = other.write;
+  addr  = other.addr;
+  data  = other.data;
+endfunction
+</code></pre>
+<p><strong>执行过程</strong>：通用对象操作调用框架；field macro 指明自动参与的字段；hook 补充复杂语义。宏与手写逻辑混用时要确认字段不会重复或被覆盖。</p>
+<p><strong>常见坑</strong>：误以为 <code>rand</code> 就自动进入所有 compare/print；忘记 <code>super.do_copy</code>；数组中对象只复制句柄；复制响应却不比较响应。</p>
+<p><strong>练习与答案要点</strong>：compare 应包含影响协议行为或验证期望的字段。纯日志字段通常不比较，除非项目定义它具有事务语义。</p>
+<p>Field flags 的版本变化很关键：1800.2 实现中 <code>UVM_DEFAULT</code> 等于 <code>UVM_ALL_ON</code>，会明确启用 copy/compare/print/record/pack/unpack/set 等默认操作；若传入 <code>UVM_REFERENCE</code>，要写成 <code>UVM_DEFAULT | UVM_REFERENCE</code> 才同时保留这些操作和 handle-copy 策略。UVM 1.2 及更早实现曾把 <code>UVM_ALL_ON</code> 隐式 OR 到传入 flags；1800.2 按显式 flags 行事。迁移旧代码时不能依赖隐式默认，Accellera 建议写清 <code>UVM_ALL_ON | UVM_REFERENCE</code> 或对应所需 flags。另有 field macro 的 config 自动应用优化差异，见 <a href="https://github.com/accellera-official/uvm-core/blob/main/README.md">UVM Core README</a> 和 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_object_globals.svh"><code>uvm_object_globals.svh</code></a>。</p>
+<h2 id="6-packunpackprintrecord序列化与可观测性">6. Pack、unpack、print、record：序列化与可观测性</h2>
+<p><code>pack/unpack</code> 把对象字段转换为 bit/integer stream；<code>print/convert2string</code> 产生人可读日志；<code>record</code> 可把对象信息送到 transaction recording 后端。它们解决不同问题，不能把日志字符串当成协议格式。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+item.print();
+`uvm_info(&quot;ITEM&quot;, item.convert2string(), UVM_MEDIUM)
+</code></pre>
+<p>对外二进制接口应独立定义位序、大小端、长度和兼容规则，不依赖 UVM packer 默认顺序。</p>
+<p><strong>常见坑</strong>：以为 print 包含全部字段；把 <code>convert2string</code> 当稳定机器接口；日志太多拖慢回归；packing 动态数据却没编码长度。</p>
+<p><strong>练习与答案要点</strong>：mismatch 时打印 <code>convert2string()</code> 有助于复现；正确性比较仍应直接比较字段，而非比较日志字符串。</p>
+<p>参考 <a href="https://github.com/accellera-official/uvm-core/tree/main/docs/html">UVM Core API 文档</a> 及 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_object.svh"><code>uvm_object.svh</code></a>。</p>
+<h2 id="7-factory创建类型与实际实例解耦">7. Factory：创建类型与实际实例解耦</h2>
+<p>factory 注册 type proxy，在 <code>type_id::create()</code> 时依据 override 选择实际类型。env 请求基础 driver，test 可选择带延迟或错误注入的派生 driver。只有 factory create 才会应用 override；直接 <code>new</code> 不受工厂控制。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+class slow_mem_driver extends mem_driver;
+  `uvm_component_utils(slow_mem_driver)
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+endclass
+
+mem_driver::type_id::set_type_override(slow_mem_driver::get_type());
+</code></pre>
+<p><strong>执行过程</strong>：创建点请求基类 → factory 查 instance override → 查 type override → 解析 override 链 → 用原来的 name/parent 创建最终类型。</p>
+<p><strong>常见坑</strong>：直接 new；派生类未注册；组件已创建后才设置 override；类型不兼容；路径配置错误。</p>
+<p><strong>练习与答案要点</strong>：只让 <code>agent0.driver</code> 延迟。使用具体 instance override，并通过 factory debug 检查最终类型。</p>
+<p>参照 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_registry.svh"><code>uvm_registry.svh</code></a> 与 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_factory.svh"><code>uvm_factory.svh</code></a>。</p>
+<h2 id="8-type-overrideinstance-override-与优先级">8. Type override、instance override 与优先级</h2>
+<p>type override 按请求类型全局替换；instance override 按层级路径替换。factory 先检查匹配的 instance override，再检查 type override。多个实例路径匹配时，注册顺序与 wildcard 会影响结果，应从具体到通配注册并打印 factory 状态验证。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+mem_driver::type_id::set_type_override(slow_mem_driver::get_type());
+mem_driver::type_id::set_inst_override(error_mem_driver::get_type(),
+                                       &quot;uvm_test_top.env.agent0.driver&quot;, null);
+</code></pre>
+<p><strong>常见坑</strong>：相对/绝对 path 语义弄反；wildcard 过宽；忘记创建通过 factory；override 链最终类型不是预期派生类。</p>
+<p><strong>练习与答案要点</strong>：两个 driver 只替换第二个。写出完整实例路径，运行 factory debug，确认第一个保持基础类。</p>
+<h2 id="9-config-db按层级查配置">9. Config DB：按层级查配置</h2>
+<p><code>uvm_config_db#(T)::set/get</code> 提供带类型的层级配置。常见用途是 top 把 virtual interface 交给 driver/monitor，test 把 active/passive、延迟、地址范围交给 agent。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+uvm_config_db#(virtual mem_if)::set(null,
+  &quot;uvm_test_top.env.agent*&quot;, &quot;vif&quot;, bus_if);
+if (!uvm_config_db#(virtual mem_if)::get(this, &quot;&quot;, &quot;vif&quot;, vif))
+  `uvm_fatal(&quot;NOVIF&quot;, &quot;virtual interface is missing&quot;)
+</code></pre>
+<p>Accellera UVM 1.2 config_db 说明：build-time 层级越高优先级越高，同层最后写入获胜；build 结束后新设置使用默认优先级，runtime 的后写值可以覆盖先前 build-time 设置。前提是请求的类型、field key 和 scope 匹配；它并不会因为原设置来自更高 component 就自动保留 build-time 优先级。真实项目仍须按所用版本核对，不能只凭“路径更具体就赢”判断。</p>
+<p><strong>执行过程</strong>：set 将类型/路径/key 写入资源；get 解析当前上下文与 wildcard，按优先级查找；失败返回 0，应立即 fatal 并打印 component path。</p>
+<p><strong>常见坑</strong>：set/get 类型不同；key/path 拼错；wildcard 太宽；runtime 低层覆盖 test 配置；共享可变 config object 却没有所有权规则。</p>
+<p><strong>练习与答案要点</strong>：test 在 build 设置 timeout=100，driver 在 run 设置同类型、key、匹配 scope 的 timeout=20。UVM 1.2 的 runtime last-write 规则会使之后的 20 生效。要保持 test 作为唯一配置所有者，就不要让低层 driver 再 set 同一资源；开启 config trace/print audit 验证。</p>
+<p>参照 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_config_db.svh"><code>uvm_config_db.svh</code></a>、<a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_config_db_implementation.svh">Config DB 实现</a> 和 <a href="https://www.accellera.org/images/downloads/standards/uvm/uvm_users_guide_1.2.pdf">UVM 1.2 User Guide</a>。</p>
+<h2 id="10-tlm-1portexportimp-与类型化连接">10. TLM-1：port、export、imp 与类型化连接</h2>
+<p>TLM-1 用 port/export/imp 描述组件间方法接口。port 是调用方；export 把下层实现向上暴露；imp 是最终实现端。<code>connect_phase</code> 建连接，连接类型必须兼容。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+seq_item_port.connect(sequencer.seq_item_export);
+monitor.ap.connect(scoreboard.analysis_export);
+</code></pre>
+<p><strong>执行过程</strong>：build 创建端口对象 → connect 建结构 → elaboration 检查连接 → 运行中经连接转发调用。前一条是 driver/sequencer 请求通道，后一条是 monitor 广播观察。</p>
+<p><strong>常见坑</strong>：忘记 connect；方向或参数类型不匹配；以为连接会复制对象；把 transaction 检查都塞进 driver。</p>
+<p><strong>练习与答案要点</strong>：monitor 同时接 scoreboard 与 coverage collector。用一个 analysis port 多播，两端只读输入；如需延迟保存则 clone 或约定不可变。</p>
+<p>官方 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/tlm1/uvm_analysis_port.svh"><code>uvm_analysis_port.svh</code></a> 说明 analysis port 广播给所有 subscriber，analysis imp 调用 parent 的 <code>write</code>。</p>
+<h2 id="11-analysis-port零时间广播与-handle-所有权">11. Analysis port：零时间广播与 handle 所有权</h2>
+<p><code>uvm_analysis_port#(T)</code> 可连接多个消费者；<code>write(t)</code> 同步调用各接收端 <code>write(t)</code>。它没有 ready/backpressure，不自动 queue 或 clone。subscriber 的 <code>write</code> 是 function，不能消耗仿真时间。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+function void write(mem_item tr);
+  mem_item saved;
+  if (!$cast(saved, tr.clone())) `uvm_fatal(&quot;CLONE&quot;, &quot;bad clone&quot;)
+  pending.push_back(saved);
+endfunction
+</code></pre>
+<p><strong>执行过程</strong>：monitor 在握手边沿建事务并广播；subscriber 同步收到同一个 handle；若要跨时间保存，应 clone 或确保发布后永不修改。</p>
+<p><strong>常见坑</strong>：在 write 中 delay；消费者互相修改对象；queue 存共享可变 handle；误以为 analysis port 有背压。</p>
+<p><strong>练习与答案要点</strong>：发布后 monitor 执行 <code>tr.addr++</code>，subscriber 看到同一个对象被修改。修复：发布定型事务且不再修改，或消费方复制。</p>
+<h2 id="12-tlm-fifo把方法调用缓冲为队列">12. TLM FIFO：把方法调用缓冲为队列</h2>
+<p>consumer 若要晚些处理，可用 <code>uvm_tlm_analysis_fifo</code> 接收 analysis 事务，再在 task 中 <code>get()</code>。FIFO 解耦处理时点，但不保证深拷贝。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+uvm_tlm_analysis_fifo#(mem_item) observed_fifo;
+task run_phase(uvm_phase phase);
+  mem_item tr;
+  forever begin
+    observed_fifo.get(tr);
+    process_transaction(tr);
+  end
+endtask
+</code></pre>
+<p><strong>执行过程</strong>：monitor write → FIFO 入队 → scoreboard get → 更新模型。生产快于消费时会积压；多流输入需保留来源 ID。</p>
+<p><strong>常见坑</strong>：无限积压；响应和请求未配对；把 FIFO 当 scoreboard；多 agent 共用一队列却假设顺序等于设计语义。</p>
+<p><strong>练习与答案要点</strong>：两 agent 接同一 scoreboard。用两个输入队列或带 source/tag 的合并流，根据协议 ID/关系配对，不假设 callback 顺序就是要求顺序。</p>
+<h2 id="13-tlm-2知道边界不与-tlm-1-混为一谈">13. TLM-2：知道边界，不与 TLM-1 混为一谈</h2>
+<p>TLM-2 提供 generic payload、initiator/target socket、transport/blocking/nonblocking 调用与时间延迟概念，常用于更高抽象的事务建模或跨语言平台。典型 pin-level VIP 主要用 sequence item 通道和 TLM-1 analysis。</p>
+<pre><code class="language-systemverilog">// 教学伪代码，未运行；不是可编译 UVM API 示例
+// initiator_socket.b_transport(payload, delay);
+</code></pre>
+<p><strong>执行过程</strong>：initiator 构造 payload → 调用 target transport → target 返回状态/数据并处理 delay。接口契约、payload 生命周期和时间语义都需查对应版本。</p>
+<p><strong>常见坑</strong>：把 TLM-2 当成 sequence item 的另一种拼法；在需要 pin timing 的 VIP 过度抽象；假定所有仿真器版本支持一致。</p>
+<p><strong>练习与答案要点</strong>：简化总线练习必须用 TLM-2 吗？不需要；TLM-1 足以连接 sequence/driver 与 monitor/checker。</p>
+<p>参考 Accellera <a href="https://github.com/accellera-official/uvm-core/tree/main/src/tlm2"><code>src/tlm2</code></a>。</p>
+<h2 id="14-uvm-phases建树连接运行收尾">14. UVM phases：建树、连接、运行、收尾</h2>
+<p>常用 function phases 有 build、connect、end_of_elaboration、start_of_simulation、extract、check、report、final；task runtime schedule 包含 reset/configure/main/shutdown 等子阶段。传统 <code>run_phase</code> 与 runtime schedule 并行运行，它不是这些子阶段的前后顺序之一；它通常从 runtime 开始时启动，并持续到该 task phase 的 objection 清零。各 runtime 子阶段在 schedule 中按定义的先后关系推进，而同一 task phase 对不同 component 的回调以并发 process 执行，不应假设整个环境逐组件串行跑完一个阶段再启动下一个组件。</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>常见职责</th>
+<th>消耗仿真时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>build</td>
+<td>创建子组件、取配置</td>
+<td>否</td>
+</tr>
+<tr>
+<td>connect</td>
+<td>连接 TLM ports</td>
+<td>否</td>
+</tr>
+<tr>
+<td>end_of_elaboration</td>
+<td>检查拓扑</td>
+<td>否</td>
+</tr>
+<tr>
+<td>run</td>
+<td>驱动/观察/响应</td>
+<td>是</td>
+</tr>
+<tr>
+<td>extract/check/report</td>
+<td>汇总、最终检查、报告</td>
+<td>否</td>
+</tr>
+</tbody>
+</table>
+<p><strong>执行过程</strong>：建组件树 → build → connect → runtime schedule 启动；<code>run_phase</code> 同时运行，runtime 子阶段依 schedule 排序推进 → 收尾。phase task 返回本身不表示 phase 结束；其 objection 清零后 task phase 才结束。</p>
+<p><strong>常见坑</strong>：在 build 启动 sequence；在 connect 创建组件；在 function phase delay；假设所有 component 同名 task phase 一定严格串行。</p>
+<p><strong>练习与答案要点</strong>：vif 在 build 获取；TLM 在 connect 连接；遗留 outstanding 在 check 汇总。</p>
+<p>官方说明见 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_component.svh"><code>uvm_component.svh</code></a> 和 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_phase.svh"><code>uvm_phase.svh</code></a>。</p>
+<h2 id="15-objectiontask-phase-的完成条件">15. Objection：task phase 的完成条件</h2>
+<p><code>run_phase</code> 等 task phase 可 raise/drop objection。没人 raise 时 phase 可能很快结束；每个 raise 必须在相应工作真正完成后 drop。sequence 生命周期与 phase 生命周期是两件事。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+task run_phase(uvm_phase phase);
+  phase.raise_objection(this, &quot;traffic active&quot;);
+  seq.start(sequencer);
+  wait_for_final_response();
+  phase.drop_objection(this, &quot;responses checked&quot;);
+endtask
+</code></pre>
+<p>objection 有层级累计；task phase 对应的 objection 可设置 drain time，在 objection 清零后留出额外收尾时间，但它不能替代 outstanding 清零条件。旧版 UVM 1.2 教程常见 <code>uvm_test_done.set_drain_time</code>；在 IEEE 1800.2 风格代码中，应从当前 phase 取得 objection 再设置。不要把旧版 <code>uvm_test_done</code> 写法直接移植到新版本。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行；按所用版本和 timescale 核对
+phase.get_objection().set_drain_time(this, 20ns);
+</code></pre>
+<p><strong>执行过程</strong>：raise → 发 stimulus → 等 response 和 checker → drop → phase 结束，剩余 phase 管理 process 会被终止。</p>
+<p><strong>常见坑</strong>：忘 drop 导致挂起；item_done 后立刻 drop 但 response 尚未到；多个组件 raise 只有部分 drop；固定 delay 代替明确完成条件。</p>
+<p><strong>练习与答案要点</strong>：driver item_done 后下一拍才有 read response。objection 应等 response 和 scoreboard 检查完成，最好等待 outstanding count 为零。</p>
+<p><code>uvm_component</code> 文档明确 task 返回不决定 phase 持续，objection 清零才结束 task phase；objection API 见 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_objection.svh"><code>uvm_objection.svh</code></a>。<a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_component.svh">组件源码</a></p>
+<h2 id="16-sequencesequencerdriver-的握手">16. Sequence、sequencer、driver 的握手</h2>
+<p>sequence 负责场景；sequencer 仲裁；driver 执行协议。pull 模式下，sequence <code>start_item</code> 请求 grant，填充 item，<code>finish_item</code> 等 driver 完成；driver <code>get_next_item</code> 后驱动，最后 <code>item_done</code>。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+task body();
+  mem_item req = mem_item::type_id::create(&quot;req&quot;);
+  start_item(req);
+  if (!req.randomize() with { addr[1:0] == 0; })
+    `uvm_fatal(&quot;RAND&quot;, &quot;cannot randomize&quot;)
+  finish_item(req);
+endtask
+</code></pre>
+<p><strong>执行过程</strong>：grant 不代表总线完成；finish_item 在等待 driver done；item_done 是请求级完成通知，不必等价于有独立 response 的协议结束。</p>
+<p><strong>常见坑</strong>：driver 改 sequence item；item_done 太早或遗漏；driver 异步保存共享 item 而 sequence 复用。</p>
+<p><strong>练习与答案要点</strong>：握手卡住，沿 sequence start、sequencer grant、driver get、接口 req/ready、item_done 顺序定位。</p>
+<h2 id="17-并发仲裁prioritylock-与-grab">17. 并发仲裁、priority、lock 与 grab</h2>
+<p>多个 sequence 可并发请求同一 sequencer；arbitration mode 从当前可运行请求中选择。priority 影响仲裁，不等于协议层优先级。lock/grab 用于暂时独占请求通道；grab 通常插队能力高于普通 lock，具体效果需结合仲裁模式核对。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+lock(m_sequencer);
+send_mode_write();
+send_dependent_command();
+unlock(m_sequencer);
+</code></pre>
+<p><strong>执行过程</strong>：请求独占 → sequencer 在当前已授予/执行的 item 完成并到达下一次仲裁点后，才授予 lock/grab → 后续其他 sequence 的 grant 被挡住 → 执行短临界事务 → unlock。lock/grab 不会抢断 driver 正在执行的 item，也不会回滚已送到接口的事务。长时间持锁会饿死其他 sequence。</p>
+<p><strong>常见坑</strong>：把 sequence lock 当 semaphore；忘 unlock；过度锁定；多个 sequence 互等死锁；误以为 priority 能修协议依赖。</p>
+<p><strong>练习与答案要点</strong>：当前 item 正在等待 ready 时，另一个 sequence 发起 grab。当前事务仍须由 driver 完成或按 reset/error policy 终止；grab 只影响之后的仲裁，不能中途夺走这个 item。两笔操作之间禁止插入请求时再用短 lock 区，或把操作封装为原子协议场景。</p>
+<p>查 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/seq/uvm_sequencer_base.svh"><code>uvm_sequencer_base.svh</code></a>。</p>
+<h2 id="18-responsetransaction-id-与-response-queue">18. Response、transaction ID 与 response queue</h2>
+<p>请求 item 与 response 可能不同。若 driver 用 <code>item_done(rsp)</code> 或 response port 返回结果，sequence 可 <code>get_response</code> 接收。response 必须带回请求的 sequence/transaction identity，让 sequencer 路由到正确 sequence。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+mem_item rsp = mem_item::type_id::create(&quot;rsp&quot;);
+rsp.set_id_info(req);
+rsp.rdata = sampled_data;
+seq_item_port.item_done(rsp);
+</code></pre>
+<p>多个 outstanding 时，sequence ID 与 transaction ID 配对尤其重要。response queue 的容量、丢弃和延迟行为应查使用版本的 API。Accellera 1800.2 实现会对 sequence 已结束后才到的 response 报 warning，提醒开发者管理响应生命周期。</p>
+<p><strong>执行过程</strong>：driver 收请求 → response 返回 → 构造 response → <code>set_id_info(req)</code> → 送回 sequencer → sequencer 按 ID 路由 → sequence <code>get_response</code>。</p>
+<p><strong>常见坑</strong>：不复制 ID；多个 outstanding 却按返回顺序盲目配对；sequence 已结束 response 才到；混淆 item_done 与独立 response。</p>
+<p><strong>练习与答案要点</strong>：两个读允许乱序返回。用协议 tag/id 关联，而不是依赖队列位置；scoreboard 同样按 ID 处理。</p>
+<p>参考 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/seq/uvm_sequence_item.svh"><code>uvm_sequence_item.svh</code></a> 与 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/tlm1/uvm_sqr_ifs.svh"><code>uvm_sqr_ifs.svh</code></a>。</p>
+<h2 id="19-virtual-sequence跨多个-agent-编排">19. Virtual sequence：跨多个 agent 编排</h2>
+<p>virtual sequence 不直接驱动物理接口，而是协调多个子 sequencer 上的 sequence。例如 command、data、interrupt agent 的场景组合。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+task body();
+  fork
+    cmd_seq.start(p_sequencer.cmd_sqr);
+    data_seq.start(p_sequencer.data_sqr);
+  join
+  irq_seq.start(p_sequencer.irq_sqr);
+endtask
+</code></pre>
+<p><strong>执行过程</strong>：virtual sequencer 暴露各子 sequencer handle；test 启动 virtual sequence；它按依赖串行或并行启动子 sequence。objection 覆盖所有子场景与响应收尾。</p>
+<p><strong>常见坑</strong>：子 sequencer handle 为空；不同 agent 有共享资源却未同步；virtual sequence 直接控制 pin；把 virtual sequencer 做成巨大服务定位器。</p>
+<p><strong>练习与答案要点</strong>：两个独立 agent 同步开始。可以 fork 启动，但需自行建立同步点；不同 sequencer 的 grant 和 driver 相位不天然对齐。</p>
+<h2 id="20-reset区分协议重置sequence-中断与模型清理">20. Reset：区分协议重置、sequence 中断与模型清理</h2>
+<p>reset 要定义 outstanding request 如何处理、driver 当前 item 如何结束、sequence 是否 kill/restart、monitor 是否发布 reset 期间事务、scoreboard 模型保留或清空哪些状态。控制器 reset 不一定清除 DRAM 内容，行为取决于规范与 DUT。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+if (!vif.reset_n) begin
+  drive_idle();
+  abort_or_complete_current_item_by_policy();
+end
+</code></pre>
+<p>常见组织是 reset sequence 控制复位，driver 安全 idle，monitor 标记或抑制复位期活动，scoreboard 按规范 flush pending queue 或保留 memory model。不能在 reset callback 里无条件清空所有模型。</p>
+<p><strong>执行过程</strong>：reset assert → 阻止新事务 → 处理未完成请求 → DUT 恢复 → driver/monitor 确认稳定 → 继续测试。协议若允许取消事务，应有明确取消语义。</p>
+<p><strong>常见坑</strong>：scoreboard 留旧 outstanding；driver process 在 phase 结束被杀但状态残留；test 提前 drop objection；DUT 与参考模型的存储保留规则不一致。</p>
+<p><strong>练习与答案要点</strong>：read response 等待中发生 reset。说明 response 是取消、错误返回还是恢复后继续；sequence 收什么；scoreboard 如何删除 pending；memory 是否保留。</p>
+<h2 id="21-scoreboardreference-model定义事务关联再比较">21. Scoreboard/reference model：定义事务关联再比较</h2>
+<p>scoreboard 不只是比较两根线。单 outstanding 可按序比较；多 outstanding、多 agent 或乱序响应需要 tag、地址、source ID 等关联键。reference model 表达规范期望，monitor 提供实际观察。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+function void write(mem_item actual);
+  int idx;
+  idx = int'(actual.addr) &gt;&gt; 2;
+  if (actual.write) model[idx] = actual.data;
+  else if (actual.rdata !== model[idx])
+    `uvm_error(&quot;SB&quot;, $sformatf(&quot;addr=%02h exp=%08h got=%08h&quot;,
+                               actual.addr, model[idx], actual.rdata))
+endfunction
+</code></pre>
+<p><strong>执行过程</strong>：monitor 发布实际事务 → scoreboard 决定更新模型还是匹配响应 → 比较返回值 → 记录检查数与错误数 → check_phase 确认没有遗留项。</p>
+<p><strong>常见坑</strong>：用 sequence item 更新模型并用同一项做 expected，绕过真实接口错误；未初始化读强行比较；忽略 byte mask；多个 response 乱序却只比队首；回归未检查错误计数。</p>
+<p><strong>练习与答案要点</strong>：实现 4-bit byte enable。逐 byte 更新模型；读比较只检查规范定义的有效 byte；未定义位不能擅自断言为 0。</p>
+<h2 id="22-outstanding-管理与仿真结束条件">22. Outstanding 管理与仿真结束条件</h2>
+<p>多 outstanding 环境需要 pending 表：请求发出时按 tag 建 entry，响应到来时查找、核对并删除。地址重复不能唯一定位；ID 复用要控制生命周期与 reset flush。</p>
+<pre><code class="language-systemverilog">// 教学伪代码，未运行
+pending_by_id[req.id] = expected_result(req);
+if (!pending_by_id.exists(rsp.id))
+  `uvm_error(&quot;SB&quot;, &quot;unexpected response ID&quot;)
+else begin
+  compare_response(rsp, pending_by_id[rsp.id]);
+  pending_by_id.delete(rsp.id);
+end
+</code></pre>
+<p><strong>执行过程</strong>：请求被接受时 pending 数 +1；有效 response 完成检查后 -1；stimulus 完成后等待 pending size 为零；check_phase 检查没有 leaked entry。</p>
+<p><strong>常见坑</strong>：只在 sequence 端计数；相同 ID 重用覆盖旧 entry；异常 response 不移除导致死等；固定 delay 后假设事务都完成。</p>
+<p><strong>练习与答案要点</strong>：objection 怎样避免永不下降？以 pending 清零作为正常结束条件，watchdog 超时时打印所有 outstanding ID 和请求内容并 fatal。</p>
+<h2 id="23-reportingseverityidverbosity-与可复现日志">23. Reporting：severity、ID、verbosity 与可复现日志</h2>
+<p>UVM reporting 使用 <code>uvm_info</code>、<code>uvm_warning</code>、<code>uvm_error</code>、<code>uvm_fatal</code> 等 severity，辅以稳定 ID 和 verbosity。report server 处理输出与统计；回归必须检查错误计数或仿真状态，不能只看最后一句 PASS。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+`uvm_info(&quot;DRV&quot;, $sformatf(&quot;issue %s&quot;, req.convert2string()), UVM_MEDIUM)
+`uvm_error(&quot;SB/MISMATCH&quot;, $sformatf(&quot;id=%0d exp=%h got=%h&quot;, id, exp, got))
+</code></pre>
+<p><strong>执行过程</strong>：宏创建报告 → handler/server 依 severity、verbosity、ID/action 处理 → 输出或计数 → 最终 summary 供 regression 汇总。</p>
+<p><strong>常见坑</strong>：所有信息都用低 verbosity；mismatch 没有 addr/tag/expected/actual；用 info 伪装错误；抑制 error 后 regression 仍报 PASS；所有消息 ID 都叫 DEBUG。</p>
+<p><strong>练习与答案要点</strong>：scoreboard mismatch 日志要含稳定 ID、tag/address、expected、actual、有效 mask，并保证回归能识别 error。</p>
+<p>报告 API 位于 <a href="https://github.com/accellera-official/uvm-core/tree/main/src/base">Accellera UVM Core <code>src/base</code></a>。</p>
+<h2 id="24-callback-与-report-catcher扩展点不要隐藏主流程">24. Callback 与 report catcher：扩展点，不要隐藏主流程</h2>
+<p>callbacks 允许不改组件主体就增加特定操作前后的钩子，适合横切行为，如 driver fault injection 或额外统计。Factory 派生类通常更直观；callbacks 不应隐藏主要协议逻辑。</p>
+<pre><code class="language-systemverilog">// 教学伪代码，未运行
+class mem_driver_cb extends uvm_callback;
+  virtual task pre_drive(mem_item tr);
+    if (inject_once) tr.data ^= 1;
+  endtask
+endclass
+</code></pre>
+<p><strong>执行过程</strong>：组件在确定代码点执行 callback 列表；可有多个 callback；顺序与注册约定需明确。要检查 callback 是否修改了共享 transaction。</p>
+<p>report catcher 是 reporting 专用 callback，可以在报告输出前检查/改写某条报告的 severity/action 或 message。它适合统一处理已知噪音与消息格式，不适合通过吞掉 scoreboard error 把失败变成 PASS。</p>
+<pre><code class="language-systemverilog">// 教学伪代码，未运行：接口细节按对应 UVM 版本查 API
+class known_warning_catcher extends uvm_report_catcher;
+  function action_e catch();
+    if (get_id() == &quot;KNOWN_BENIGN&quot;) set_severity(UVM_INFO);
+    return THROW;
+  endfunction
+endclass
+</code></pre>
+<p><strong>常见坑</strong>：主要协议行为藏在 callback；callback 依赖执行顺序；修改 sequence 原始 item；未记录注入配置；全局 catcher 静默修改 scoreboard 错误。</p>
+<p><strong>练习与答案要点</strong>：单次故障注入可派生 driver（透明）或 callback（横切功能确需复用）；都要记录启用状态和注入点。</p>
+<h2 id="25-functional-coveragecovergroup-的采样语义">25. Functional coverage：covergroup 的采样语义</h2>
+<p>功能覆盖率应从验证计划映射而来。coverpoint/bins/cross 记录是否发生某些行为；它不判断行为正确性。采样通常由 monitor transaction 驱动，而非 sequence 原计划，以确认 stimulus 真正经过接口。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+covergroup mem_cg with function sample(bit is_write, bit [7:0] addr);
+  cp_op: coverpoint is_write { bins read = {0}; bins write = {1}; }
+  cp_region: coverpoint addr[7:5] { bins low = {[0:1]}; bins high = {[6:7]}; }
+  op_region: cross cp_op, cp_region;
+endgroup
+</code></pre>
+<p><strong>执行过程</strong>：monitor 确认事务有效 → subscriber sample → bins/cross 更新 → regression 合并覆盖数据库。reset 或非法事务是否采样由计划定义。</p>
+<p><strong>常见坑</strong>：无目的做巨大 cross；不处理 ignore/illegal bins；只看百分比不看缺失 bins；把 100% 覆盖当无 bug。</p>
+<p><strong>练习与答案要点</strong>：op、地址区、burst 长度三维 cross 前先确认计划需要哪些组合；非法组合排除；不影响风险决策的维度不要盲目交叉。</p>
+<h2 id="26-ral-概念registerfieldfrontdoorbackdoor">26. RAL 概念：register、field、frontdoor/backdoor</h2>
+<p>RAL 用 <code>uvm_reg_block</code>、<code>uvm_reg</code>、<code>uvm_reg_field</code> 描述寄存器结构、字段位宽/访问属性和地址映射。frontdoor 经 bus agent 真实访问；backdoor 通过 HDL 路径直接访问。frontdoor 验总线与访问路径，backdoor 适合初始化或诊断，但绕过协议。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+uvm_status_e status;
+uvm_reg_data_t value;
+ral.ctrl.enable.write(status, 1);
+ral.status.read(status, value);
+</code></pre>
+<p><strong>执行过程</strong>：RAL API → <code>uvm_reg_item</code> → map 解地址/path → adapter 变成 bus item → sequencer/driver 执行 → predictor 更新 mirror → API 返回 status/data。</p>
+<p><strong>常见坑</strong>：把 DRAM 命令都建成 CSR；field access policy 错；backdoor write 后 mirror 未同步；reset value 与 DUT 不符；不知道 frontdoor 连到哪个 map/agent。</p>
+<p><strong>练习与答案要点</strong>：FineSim 的 DRAM 命令通常不应强行建成 RAL register；RAL 更适合控制器/PHY CSR 或模型控制寄存器，颗粒命令仍用协议 transaction/sequence。</p>
+<p>参考 <a href="https://github.com/accellera-official/uvm-core/tree/main/src/reg"><code>src/reg</code></a> 与 UVM 1.2 User Guide 的 Register Abstraction Layer 部分。</p>
+<h2 id="27-ral-desiredmirrorreadpredict">27. RAL desired、mirror、read、predict</h2>
+<p>desired value 是 test 希望的值；mirror value 是模型认为的 DUT 当前值；read 会发起读取并获得观测；predict 根据已知访问或 monitor 观察更新 mirror。<code>set()</code> 通常只改 desired；<code>write()</code> 发访问；<code>predict()</code> 更新模型。具体语义受 field policy 和 API 版本影响。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+ral.ctrl.enable.set(1);       // desired
+ral.ctrl.update(status);      // 必要时写 DUT
+ral.ctrl.read(status, value); // 实际读取
+ral.ctrl.predict(value);      // 更新 mirror；仅示意
+</code></pre>
+<p><code>read(status, value, ...)</code> 会通过所选路径（通常 frontdoor）真实发起总线读，<code>value</code> 是该次读返回的观测值；模型 mirror 是否随读更新，取决于 auto-prediction、显式 <code>predict</code> 或连接的 bus predictor。<code>mirror(status, UVM_CHECK, ...)</code> 也会读取 DUT，并把观测值与当前 mirror 比较，发现不一致时报告错误；它不是“只读 mirror”。<code>mirror(..., UVM_NO_CHECK, ...)</code> 跳过比较，但仍执行读取，并按 RAL 预测配置更新模型。<code>get()</code> 返回 desired，<code>get_mirrored_value()</code> 返回模型缓存，二者都不访问 DUT。具体副作用仍须按 field policy 与所用实现核对。</p>
+<p><strong>执行过程</strong>：test 设置 desired → update/frontdoor 写 DUT → monitor 看见写访问 → predictor 更新 mirror → 后续 compare 判断状态。auto prediction 与手工 predict 同开可能重复更新。读回值应先看 <code>status</code> 和返回 <code>value</code>；mirror 检查则用于验证模型预测与 DUT 是否一致。</p>
+<p><strong>常见坑</strong>：认为 set 已访问 DUT；mirror 当成真实值；读清零副作用未建模；硬件异步更新字段未配置；只看 mirror 不看 bus 成功状态。</p>
+<p><strong>练习与答案要点</strong>：monitor 看到寄存器写但 mirror 旧。检查 map/adapter、monitor 到 predictor 连接、auto_predict、field policy 和寄存器路径。</p>
+<p>参照 <a href="https://github.com/accellera-official/uvm-core/blob/main/src/reg/uvm_reg.svh"><code>uvm_reg.svh</code></a>、<a href="https://github.com/accellera-official/uvm-core/blob/main/src/reg/uvm_reg_predictor.svh"><code>uvm_reg_predictor.svh</code></a>、<a href="https://github.com/accellera-official/uvm-core/blob/main/src/reg/uvm_reg_adapter.svh"><code>uvm_reg_adapter.svh</code></a>。</p>
+<h2 id="28-ral-adapter-与-predictor">28. RAL adapter 与 predictor</h2>
+<p>adapter 的 <code>reg2bus()</code> 把 RAL operation 转为 bus transaction；<code>bus2reg()</code> 把 monitor 观察到的事务转成 <code>uvm_reg_bus_op</code>。predictor 订阅 bus monitor，解码访问并更新目标寄存器 mirror。adapter 不驱动 pin。</p>
+<pre><code class="language-systemverilog">// 教学伪代码，未运行
+function uvm_sequence_item reg2bus(const ref uvm_reg_bus_op op);
+  mem_item tr = mem_item::type_id::create(&quot;tr&quot;);
+  tr.write = (op.kind == UVM_WRITE);
+  tr.addr  = op.addr[7:0];
+  tr.data  = op.data;
+  return tr;
+endfunction
+</code></pre>
+<p><strong>执行过程</strong>：RAL frontdoor → adapter reg2bus → bus sequencer → driver → monitor → predictor bus2reg → map/reg/field predict。实际代码还要处理 byte enable、status、endianness、地址宽度和 response。</p>
+<p><strong>常见坑</strong>：monitor 未接 predictor；read data/status 未填；map endian/base address 错；auto_predict 与显式 predictor 双重更新。</p>
+<p><strong>练习与答案要点</strong>：bus read 正确但 mirror 错，检查反向 bus2reg 映射和预测配置，而不只看 DUT 返回值。</p>
+<h2 id="29-register-sequences-与访问策略">29. Register sequences 与访问策略</h2>
+<p>寄存器 sequence 可遍历模型做访问、bit-bash、reset 检查。它们依赖准确的 access policy、reset value、volatile、side effect、map、adapter 和 predictor。不能对所有寄存器盲目跑通用访问。</p>
+<p><strong>执行过程</strong>：sequence 查 block/map → 选择安全寄存器 → 经 frontdoor/backdoor 访问 → 比较读回或 mirror → 汇总错误。</p>
+<p><strong>常见坑</strong>：未过滤 read-clear/W1C；bit-bash 改坏后续 boot 状态；volatile 字段按静态值检查；没有 reset model 就跑 reset sequence。</p>
+<p><strong>练习与答案要点</strong>：status register 某 bit 读清零。正确设置访问策略与副作用，通用测试应跳过或专门校验该行为。</p>
+<h2 id="30-同步原语与队列eventmailboxsemaphoreprocess">30. 同步原语与队列：event、mailbox、semaphore、process</h2>
+<p>UVM 不取代 SystemVerilog 并发原语。event 通知；mailbox/queue 传数据；semaphore 互斥；<code>fork...join_*</code> 管并发。它们要与 phase 生命周期配合，避免残留线程。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行
+mailbox #(mem_item) q = new();
+fork
+  forever begin
+    mem_item tr;
+    q.get(tr);           // task，可等待
+    handle_response(tr);
+  end
+join_none
+</code></pre>
+<p><strong>执行过程</strong>：producer put → consumer get；queue 保存对象 handle；phase 结束会终止该 phase 管理的 process。长期线程要明确由谁启动、停止和清理。</p>
+<p><strong>常见坑</strong>：无限 fork 无退出条件；semaphore 不释放；mailbox 存共享可变 handle；phase 结束后仍有非 phase 线程访问 interface。</p>
+<p><strong>练习与答案要点</strong>：每个输入都需恰好一个 consumer 处理，使用队列/FIFO 保存 payload；单 event 不保存多次 payload。</p>
+<h2 id="31-uvm-12-与-ieee-18002版本标准和实现">31. UVM 1.2 与 IEEE 1800.2：版本、标准和实现</h2>
+<p>UVM 1.2 是较早 API/reference；IEEE 1800.2-2020 定义后续标准 API；Accellera uvm-core 是参考实现并有 release 与 deviations；商用仿真器还可能提供预编译库或补丁版。三者不能混称为同一版本。</p>
+<p>迁移应核对 simulator 支持、UVM library 版本、弃用/兼容 API、sequence response 行为、field macro 语义、DPI、RAL 差异和厂商 patch。UVM 1.2 教程可用于方法论学习，不能保证代码在 1800.2 环境直接编译。</p>
+<p>截至 2026-10-09 查阅，Accellera 下载页列出的当前 UVM 参考实现为 2020-3.2；公开 <code>accellera-official/uvm-core</code> 的 README 仍标记该仓库 kit 为 2020.3.1。二者是不同发布载体/快照，不能混称为同一源码版本。使用时以下载包、README、deviations 和工具厂商说明共同确认。<a href="https://www.accellera.org/downloads/standards/uvm">下载页</a> · <a href="https://github.com/accellera-official/uvm-core/blob/main/README.md">README</a></p>
+<p>开源仿真器状态也要按版本读：Verilator 5.052（2026-09-05）官方 release notes 明确写明支持 UVM 2020-3.2；这不是对 Verilator 5.032 的承诺。官方 UVM tracking issue 仍列出已知限制，包括需要 X/Z 的代码、virtual interface 中 clocking block 数据传播、process kill 相关行为等。因此开源 UVM 已经可作为学习/实验路径，但商业项目 VIP 仍须验证它用到的特性与具体版本。 <a href="https://verilator.org/guide/latest/changes.html?page=1">Verilator 5.052 revision history</a> · <a href="https://github.com/verilator/verilator/issues/1538">Verilator UVM support tracker</a></p>
+<p><strong>常见坑</strong>：只查网上一段代码；把 Accellera extension 当 IEEE API；把兼容旧版代码当最佳写法；假设仿真器支持完整 UVM。</p>
+<p><strong>练习与答案要点</strong>：收到 1.2 VIP 时，先核对 simulator/UVM 版本和编译选项，再跑 vendor smoke/regression，搜 deprecated/compat warning，对关键 API 查对应文档。若在本机 Verilator 5.032 尝试实验，不要直接套用 5.052 的 UVM 2020-3.2 支持声明。</p>
+<h2 id="32-调试沿最短数据链路逐层定位">32. 调试：沿最短数据链路逐层定位</h2>
+<p>检查顺序：<code>run_test</code> 是否启动目标 test；组件是否创建；config_db 是否取得 vif；TLM 是否连接；sequence 是否 start；sequencer 是否 grant；driver 是否取 item；引脚是否握手；monitor 是否发布；scoreboard 是否收到；objection 是否正确结束。</p>
+<pre><code class="language-text">症状：没波形、没日志、一直不结束
+clock/reset -&gt; run_test -&gt; build tree -&gt; vif get -&gt; TLM connect
+-&gt; sequence start -&gt; driver handshake -&gt; monitor -&gt; scoreboard -&gt; objection
+</code></pre>
+<p>使用 topology print、config trace、factory print、transaction <code>convert2string</code>、稳定 report ID 和波形。先固定一笔 directed 请求，再逐渐增加 monitor、scoreboard、随机化。</p>
+<p><strong>常见坑</strong>：同时改很多处；不看接口就先改 phase；日志没有 addr/tag/value；没报错便认为测试完成。</p>
+<p><strong>练习与答案要点</strong>：sequence 已打印 started，req 不动。依次查 grant/get_next_item、driver vif、reset、drive edge、信号是否被其它 driver 覆盖、test 是否创建预期组件。</p>
+<h2 id="33-把练习经验准确映射到-dram-验证岗位">33. 把练习经验准确映射到 DRAM 验证岗位</h2>
+<p>面试要区分已有经验与自学成果。可以说已有 DRAM FineSim fullchip 验证经验，熟悉依据目标组织 pattern sequence、观察仿真行为和分析结果；正在用教学用 SV/UVM 总线环境补齐 component/TLM/scoreboard/coverage/RAL。不要把练习描述成商用 UVM 项目。</p>
+<blockquote>
+<p>我把操作建模成 sequence item，由 sequence 组织 directed 和约束随机场景，sequencer 做并发请求仲裁，driver 在约定边沿完成总线握手。monitor 独立从真实握手重建事务，analysis port 广播给 scoreboard 和 coverage。scoreboard 用参考模型检查结果，test 等响应与检查完成后再 drop objection。这是简化总线练习，我会把这些职责映射到 DRAM 风险，但不会声称它实现 JEDEC 时序模型。</p>
+</blockquote>
+<p><strong>常见坑</strong>：背定义却画不出数据流；说 UVM 自动随机验证；把 coverage 100% 当无 bug；把事务发送成功当 DUT 正确。</p>
+<p><strong>练习与答案要点</strong>：回答“没有 UVM 项目经验，为何适合？”重点说清已有仿真调试与规范验证能力，再用可复现实验展示正在掌握的方法，诚实界定练习范围。</p>
+<h2 id="34-官方资料索引与读源码路线">34. 官方资料索引与读源码路线</h2>
+<ol>
+<li><a href="https://www.accellera.org/downloads/standards/uvm">Accellera 下载页</a>：选参考实现、User Guide 和 class reference。</li>
+<li><a href="https://github.com/accellera-official/uvm-core/blob/main/README.md">UVM Core README</a>：了解 kit 版本、API 标记、兼容与扩展。</li>
+<li><a href="https://github.com/accellera-official/uvm-core/tree/main/docs/html">自动生成 API 文档</a>：按类名查方法。</li>
+<li>源码：<a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_object.svh"><code>uvm_object</code></a>、<a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_component.svh"><code>uvm_component</code></a>、<a href="https://github.com/accellera-official/uvm-core/tree/main/src/base"><code>factory/registry</code></a>、<a href="https://github.com/accellera-official/uvm-core/blob/main/src/base/uvm_config_db.svh"><code>config_db</code></a>、<a href="https://github.com/accellera-official/uvm-core/tree/main/src/seq"><code>sequence/sequencer</code></a>、<a href="https://github.com/accellera-official/uvm-core/tree/main/src/tlm1"><code>TLM-1</code></a>、<a href="https://github.com/accellera-official/uvm-core/tree/main/src/reg"><code>RAL</code></a>。</li>
+</ol>
+<p>不要从头通读库。先从 API 注释定位问题，再看调用点和实现：compare 出错看 object hooks；factory 替换异常看 registry/path；RAL mirror 错同时看 adapter、predictor、map 与 policy。</p>
+<h2 id="35-最终自测题与参考要点">35. 最终自测题与参考要点</h2>
+<ol>
+<li>为什么 sequence 发 item 不能证明接口传输？driver 可能卡住或握手失败，应以 monitor 观察为准。</li>
+<li>clone 后嵌套对象一定独立吗？不一定，须实现并验证深拷贝。</li>
+<li>analysis port 有 backpressure 吗？没有，write 广播且不阻塞。</li>
+<li><code>item_done()</code> 是否表示 response 已检查？不一定，取决于协议和 driver 定义。</li>
+<li>type/instance override 区别？按类型全局替换 vs 按层级路径定向替换；factory create 才生效。</li>
+<li>build-time config precedence？上层优先级较高，同层后写胜；runtime 需按实际版本规则判断。</li>
+<li>objection 清零后 run process 怎样？phase 结束时 phase 管理的 process 会终止，必须先等 response/check。</li>
+<li>scoreboard 如何支持乱序？用协议 tag/ID 建 pending map。</li>
+<li><code>set/write/predict</code> 区别？更新 desired、真实访问、更新 mirror。</li>
+<li>functional coverage 100% 表示什么？定义的 bins 已达标，不证明没有 bug。</li>
+<li>UVM 1.2 代码能保证跑 IEEE 1800.2 吗？不能保证，检查兼容和工具 regression。</li>
+<li>教学存储器总线代表 DRAM 验证吗？不代表，缺少 DRAM 命令、bank/row/column、时序、refresh、训练与功耗状态。</li>
+</ol>
+<p>每题尝试用“概念一句话 + 数据流/代码路径 + 一个失效例子”回答。只会背 API 名称还不算掌握。</p>
+<h2 id="36-resource-db理解底层资源池与配置查找">36. Resource DB：理解底层资源池与配置查找</h2>
+<p><code>uvm_resource_db#(T)</code> 是按类型、资源名和 scope 访问资源池的类型化接口。<code>uvm_config_db#(T)</code> 面向组件层级配置，提供更直观的 <code>set/get</code> 上下文，并使用 resource pool 实现。一般组件参数、virtual interface 和 agent 模式优先用 config_db；resource_db 适用于需要直接管理资源、或维护使用该接口的既有框架。不要把两者的优先级规则简单视为完全相同：config_db 有明确的 component build/runtime precedence 语义；resource_db 的查找还涉及 scope、name、type、precedence 和 queue 顺序，应针对具体 API 调用及版本查看 class reference。</p>
+<pre><code class="language-systemverilog">// 教学片段，未运行：展示类型、名字、scope 的匹配；不是完整测试
+int timeout_cycles;
+uvm_resource_db#(int)::set(&quot;ENV&quot;, &quot;timeout_cycles&quot;, 100, this);
+if (!uvm_resource_db#(int)::read_by_name(
+      &quot;ENV&quot;, &quot;timeout_cycles&quot;, timeout_cycles, this)) begin
+  `uvm_fatal(&quot;NO_TIMEOUT&quot;, &quot;resource not found&quot;)
+end
+</code></pre>
+<p>调用方要保证写入与读取使用相容的类型、资源名和 scope；同名异类型资源不是同一项。调试时打印资源池或开启资源配置跟踪，并查看实际 scope 匹配，避免用过宽 wildcard 造成意外覆盖。</p>
+<p><strong>练习与答案要点</strong>：<code>read_by_name</code> 返回失败时，依次核对参数化类型、name 拼写、scope 字符串和 set 是否在读取前执行；若要做层级化 test/agent 配置，先考虑 config_db，并以该版本文档确认优先级。</p>
+<hr />
+<p><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">← 返回学习导航</a></p>
+</article><div class="doc-bottom"><a href="/sv-uvm/">← 返回学习目录</a><a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">实验源码 ↗</a></div></main></div><footer>ChenWellesCxy HUST · SV / UVM 学习笔记 <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">查看源码仓库 ↗</a></footer></body></html>

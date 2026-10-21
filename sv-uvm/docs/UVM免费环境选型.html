@@ -1,0 +1,142 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>免费 SV/UVM 仿真环境选型与上手指南 | ChenWellesCxy HUST</title><meta name="description" content="SV / UVM 学习教程、实验与 CoverageModel 实践。"><link rel="canonical" href="https://chenwellescxy.github.io/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html"><link rel="stylesheet" href="/site-shell.css"><link rel="stylesheet" href="/sv-uvm/style.css"></head><body><a class="skip" href="#content">跳到内容</a><header class="cw-site-header"><div class="cw-bar"><a class="cw-brand" href="/">ChenWellesCxy <span>HUST</span></a><nav class="cw-links" aria-label="网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><details class="cw-mobile"><summary>导航</summary><nav aria-label="手机网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></details></div></header><div class="reader"><aside><a class="back" href="/sv-uvm/">← SV / UVM 学习目录</a><details open><summary>本页章节</summary><nav aria-label="本页章节"><a href="#结论和推荐">结论和推荐</a><a href="#方案对比">方案对比</a><a href="#关键官方资料">关键官方资料</a><a href="#wsl中如何选verilator版本">WSL中如何选Verilator版本</a><a href="#建议最小冒烟验证清单">建议最小冒烟验证清单</a><a href="#选择建议">选择建议</a></nav></details><details><summary>其他文档</summary><nav aria-label="专题文档"><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a><a href="/sv-uvm/docs/SV%E6%95%99%E7%A8%8B.html">从 Pattern 到 SystemVerilog</a><a href="/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html">UVM 入门教程</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html">SV 语言基础详解</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">SV 验证主题详解</a><a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html">UVM 官方资料详解</a><a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html">独立实现 CoverageModel</a><a href="/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html">参考项目精读</a><a href="/sv-uvm/labs/03_uvm/README.html">UVM 简化存储器实验</a><a href="/sv-uvm/docs/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5.html">开源项目实践</a><a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html" aria-current="page">免费 SV/UVM 环境选型</a><a href="/sv-uvm/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.html">环境与验证记录</a><a href="/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html">学习资源调研</a></nav></details></aside><main id="content"><div class="doc-top"><div class="eyebrow">SV / UVM · 工具与资料</div><h1>免费 SV/UVM 仿真环境选型与上手指南</h1><div class="source">项目文档快照 · 2026-10-21 · <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning/blob/f09cfdaf87f25dce129bcc9a6b7c7824387e9d4b/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.md">查看原文 ↗</a></div></div><article><p>调研日期：2026-10-09。目标是让你在现有 WSL 环境里用 SystemVerilog 编写并运行一个可检查的 UVM 小环境，同时明确哪些免费途径是开源、哪些只是免费使用的商业服务。下文仅介绍方案，没有安装、注册或上传任何内容。</p>
+<h2 id="结论和推荐">结论和推荐</h2>
+<p>**优先路线：本地 Verilator 5.052 + Accellera UVM 2020-3.2 源码 + Antmicro 示例作为起点。**截至本调研日期，Verilator 官方变更记录在 5.052（2026-09-05）条目明确写出“now supports UVM 2020-3.2”，并指向限制清单；官方 UVM 跟踪 issue 还列出目前支持的 UVM 2017.1.0、2020.3.1、2020.3.2。issue 当前标记为 Open，并指出若干尚未解决行为，包括 clocking virtual interface 的数据传播、process kill/子进程清理，以及依赖 X/Z 的代码。Verilator 5.052 是开源模拟器，因此这是当前最贴合“免费、开源工具链、本地运行 SV UVM”的选择；仍需用自己的目标特性做冒烟测试。</p>
+<p>主线程已实测的 <strong>Verilator 5.032</strong> 不应被认为可以直接运行任意 UVM。该版官方变更记录没有承诺 UVM 支持；而 Antmicro 固定示例 README 要求自行构建“latest Verilator”，并没有锁定 5.032。先用它做已支持的普通 SV/约束练习没问题；遇到 UVM 编译或行为失败时，需先看版本和限制，不能直接认定 UVM 代码错误。</p>
+<p>**不想换本地工具时的备用路线：EDA Playground + Aldec Riviera-PRO。**EDA Playground 的官方 FAQ 明确说明，Riviera-PRO 支持 SystemVerilog 和 UVM，不需要 full-account 验证；服务本身不是开源模拟环境，运行发生在网站服务器上。网页目前要求登录才能运行。其 FAQ 表示 Google 登录可用非商业模拟器及部分商业模拟器；VCS、Xcelium、Questa 等另需机构/公司邮箱验证。具体实例、额度和当日可用选项以网站当前页面为准。</p>
+<p>**DSim也是可尝试的本地闭源免费个人路线。**Altair当前官方 Licensing 文档明确列出 Free Individual License：仅限个人使用、一次一项并发仿真；用户可从 DSim Cloud Portal 的 Licenses 页面生成，单个license当前有效期90天，续领需要先撤销当前license。官方还说明可在多个机器安装同一license，但同一时间只能在一台机器运行。该方式需要门户账号并按其许可条款使用；本调研没有实际注册或验证账号流程。DSim官方UVM文档列有多版UVM支持，具体以当前安装和license可访问的工具版本为准。</p>
+<h2 id="方案对比">方案对比</h2>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>SV UVM 能力</th>
+<th>费用/开放性</th>
+<th>本地/WSL情况</th>
+<th>建议用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Verilator 5.052 + Accellera UVM 2020-3.2</strong></td>
+<td>官方声明支持 UVM 2020-3.2，并提供限制清单；支持持续完善，不能假设所有 UVM 功能可用</td>
+<td>Verilator 开源；Accellera UVM 参考库可下载，库开放不代表仿真器自动兼容</td>
+<td>Linux/WSL可自行构建，需 C++ 构建依赖；官方当前变更记录适用于 5.052</td>
+<td><strong>推荐本地开源首选</strong>；用最小工程逐项确认 UVM/约束/波形需要的功能</td>
+</tr>
+<tr>
+<td>Verilator <strong>5.032</strong>（主线程实测版本）</td>
+<td>官方 5.032 变更记录未作 UVM 支持承诺；不能据此判断绝无可运行的简单案例，也不能据此承诺能跑 Antmicro UVM 环境</td>
+<td>同上</td>
+<td>已有可用于基本 SV 学习；如要做 UVM 先检查 <code>verilator --version</code> 并按示例单独验证</td>
+<td>继续跑 labs01/02/04 等轻量 SV；UVM遇到限制优先采用 5.052 的已声明能力</td>
+</tr>
+<tr>
+<td><strong>Antmicro verilator-uvm-example</strong> 固定提交</td>
+<td>一套简明 SV UVM 例子，含 item、sequence、sequencer、driver、monitor、scoreboard、env/test；README 基于 UVM 2020.3.1，命令定义 <code>UVM_NO_DPI</code></td>
+<td>仓库 Apache-2.0；示例免费公开，依赖版本和 UVM 支持由工具决定</td>
+<td>README 要求自行构建 latest Verilator；固定示例提交并未把 Verilator 固定为 5.032</td>
+<td>推荐作为代码教学模板；配 Verilator 5.052/UVM 2020-3.2时需按官方限制确认，或完全复现README指定组合</td>
+</tr>
+<tr>
+<td><strong>EDA Playground + Riviera-PRO</strong></td>
+<td>EDA Playground官方示例/FAQ提供UVM入口；Riviera-PRO是商业仿真器</td>
+<td>网页免费使用某些商业工具，服务/模拟器均非开源；需登录，免费条款和算力受服务规则约束</td>
+<td>浏览器运行，不需要在WSL安装；代码发往在线服务</td>
+<td>快速验证标准SV UVM语法、分享可复现小例子；不要放公司代码/敏感材料</td>
+</tr>
+<tr>
+<td><strong>DSim Studio（本地）</strong></td>
+<td>官方文档列UVM-1.1b/1.1d/1.2/2020.3.1，给出 compile/elaborate/run 流程</td>
+<td>Altair商业工具；官方提供Free Individual License，不开源；个人、单并发，portal生成，90天有效，续领先revoke</td>
+<td>Studio本地运行；依赖Altair账号/门户、有效license及系统要求</td>
+<td>可作为本地闭源免费备选，验证本机UVM练习；使用限制以官方页面为准</td>
+</tr>
+<tr>
+<td><strong>Icarus Verilog</strong></td>
+<td>适合基础 RTL 与部分 SystemVerilog；官方 README 明确其不支持的 SV 构造很多，没有完整 UVM 能力承诺</td>
+<td>开源免费</td>
+<td>WSL安装简单，适合现有基础实验</td>
+<td>用于普通 SV 小实验，不用于验证 SV UVM 环境是否正确</td>
+</tr>
+<tr>
+<td><strong>pyuvm + cocotb</strong></td>
+<td>UVM概念由Python实现，测试平台是Python/cocotb，不是SystemVerilog UVM</td>
+<td>开源免费，模拟器可选</td>
+<td>可结合 Verilator/Icarus 等，具体看例子</td>
+<td>学习 transaction、sequence、agent、scoreboard 思想；不能替代目标岗位所需的SV UVM练习</td>
+</tr>
+<tr>
+<td><strong>Accellera UVM参考库单独下载</strong></td>
+<td>提供 UVM SystemVerilog class library / reference implementation</td>
+<td>开放下载；UVM源码与许可模拟器是两个独立部分</td>
+<td>需要另一个兼容的 SV 仿真器</td>
+<td>查源码/API或给仿真器编译；<strong>单独下载库不能仿真</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="关键官方资料">关键官方资料</h2>
+<h3 id="标准库和uvm教程">标准、库和UVM教程</h3>
+<ul>
+<li><a href="https://www.accellera.org/downloads/standards/uvm">Accellera UVM 下载页</a>：下载参考实现与资料。当前页面列出 UVM 2020-3.2（2026-08）及其他版本。选择库版本时要跟仿真器支持表保持一致。</li>
+<li><a href="https://www.accellera.org/community/uvm">Accellera UVM 社区页</a>：UVM 社区和 IEEE 1800.2 标准相关信息。</li>
+<li><a href="https://www.accellera.org/images/downloads/standards/uvm/uvm_users_guide_1.2.pdf">Accellera UVM 1.2 User’s Guide PDF</a>：组件、阶段和常用架构的经典教学资料。它较旧，适合学概念；用现代库/API时要对照当前标准和工具。</li>
+<li><a href="https://standards.ieee.org/ieee/1800/7743/">IEEE 1800-2023 标准页</a>：SystemVerilog语义权威来源，适合查细节而非从头通读。</li>
+<li><a href="https://accellera.org/images/resources/videos/Tutorial-IEEE-1800-2-Standard-for-UVM-2019.pdf">Accellera 2019 IEEE 1800.2 UVM 标准教程 PDF</a>：帮助理解 UVM 标准化和方法学。</li>
+<li><a href="https://www.vhdl.org/resources/videos/uvm-tutorial-2012">Accellera 2012 UVM tutorial: Ready, Set, Deploy!</a>：面向刚开始用 SV/UVM 的开发者，年代旧但可作为架构导读。</li>
+<li><a href="https://www.doulos.com/easier">Doulos Easier UVM</a>：免费、偏可读性和实用指南，适合先建立编码习惯。</li>
+</ul>
+<h3 id="verilator-与-antmicro">Verilator 与 Antmicro</h3>
+<ul>
+<li><a href="https://verilator.org/guide/latest/changes.html">Verilator 5.052 Revision History</a>：官方记录 5.052 的UVM支持条目，页面中的版本日期是 2026-09-05；也列出5.050 covergroup支持等增量。</li>
+<li><a href="https://github.com/verilator/verilator/issues/1538">Verilator UVM支持跟踪 #1538</a>：官方开发跟踪及已知限制。截至本调研日issue #1538显示支持UVM 2017.1.0、2020.3.1和2020.3.2；未正式支持其他UVM版本。仍列出的限制包括：经virtual interface访问clocking block的数据传播问题、process kill可能留下当前进程/子进程继续运行、使用X/Z值的代码。测试套件状态为658项均可Verilate/build、644项通过；具体代码是否可用仍要依赖自身目标特性冒烟验证。</li>
+<li><a href="https://verilator.org/guide/latest/languages.html">Verilator SystemVerilog限制文档</a>：官方列出的语言限制；其中说明 class 支持有限并持续开发。查看时确保手册版本匹配本地 binary。</li>
+<li><a href="https://raw.githubusercontent.com/verilator/verilator/v5.032/Changes">Verilator 5.032 原始变更记录</a>：确认本机旧版本的变更范围，不包含“支持完整UVM”的承诺。</li>
+<li><a href="https://github.com/antmicro/verilator-uvm-example/tree/e2c9b49ab9a99298190dd1fb580bd59e2c0a7dd8">Antmicro UVM with Verilator 示例（指定提交）</a>：README提供依赖、下载UVM 2020.3.1、编译与运行命令。提交固定能保证示例源文件稳定，但 README 中的“latest Verilator”会随时间变化，复现时还要另记 Verilator 版本。</li>
+<li><a href="https://www.chipsalliance.org/news/initial-open-source-support-for-uvm-testbenches-in-verilator/">CHIPS Alliance：Verilator初步支持UVM testbench</a>：较早的端到端进展说明；反映支持逐步推进，不应替代当前 Verilator 官方手册与 release notes。</li>
+</ul>
+<h3 id="在线免费商业模拟器与-icarus">在线免费商业模拟器与 Icarus</h3>
+<ul>
+<li><a href="https://github.com/edaplayground/eda-playground/blob/master/docs/faq.rst">EDA Playground 官方 FAQ（源仓库文档）</a>：说明哪些模拟器需 account validation、Riviera-PRO可以如何访问、如何选择 UVM。网页服务虽免费提供一些商业工具，不等同于开源。</li>
+<li><a href="https://github.com/edaplayground/eda-playground/blob/master/docs/tutorial.rst">EDA Playground 官方教程</a>：登录、选择 Aldec Riviera-PRO、输入示例和运行步骤。</li>
+<li><a href="https://www.edaplayground.com/">EDA Playground示例页</a>：运行前可查看当天实际工具选项。FAQ写明使用 Riviera-PRO不要求 account validation；运行仿真仍需登录。</li>
+<li><a href="https://github.com/steveicarus/iverilog/blob/master/README.md">Icarus Verilog官方 README</a>：说明 SystemVerilog 未支持构造很多；可用作语言子集仿真器，不要按完整 SV/UVM 兼容性评估。</li>
+<li><a href="https://steveicarus.github.io/iverilog/usage/index.html">Icarus官方文档</a>：命令、编译和运行选项。</li>
+</ul>
+<h3 id="dsim-与-pyuvm">DSim 与 pyuvm</h3>
+<ul>
+<li><a href="https://help.metrics.ca/support/solutions/articles/154000154925-how-to-use-uvm-in-dsim">DSim如何使用UVM（官方知识库）</a>：当前知识库显示 DSim 提供多版 UVM，并给出 compile/elaborate/run 参数。并与免费个人许可配套参考。</li>
+<li><a href="https://help.metrics.ca/support/solutions/articles/154000146984-licensing">DSim Licensing（官方知识库）</a>：当前license种类、生成方式、个人使用和单并发限制、90天有效期及revoke续领流程。个人许可在门户生成；本调研未实际注册或申请。</li>
+<li><a href="https://help.metrics.ca/support/solutions/articles/154000218174-release-2025-0-0">DSim 2025发布说明（官方知识库）</a>：说明 DSim 并入 Altair 产品组合，既有个人免费许可证与automation tokens仍有效。</li>
+<li><a href="https://help.metrics.ca/support/solutions/articles/154000141142-understanding-dsim-cloud">DSim Cloud使用说明</a>：云端作业/交互 workspace 的运行方式和计费原则。</li>
+<li><a href="https://github.com/pyuvm/pyuvm">pyuvm上游项目</a>：作者说明这是 Python实现的UVM风格框架，基于cocotb；适合理解分层验证概念，不会练到 SystemVerilog UVM class library 的实际API和语法。</li>
+</ul>
+<h2 id="wsl中如何选verilator版本">WSL中如何选Verilator版本</h2>
+<ol>
+<li>先记录当前版本：<code>verilator --version</code>。主线程实测版本为 <strong>5.032</strong>；本指南没有在你的 WSL 上实际运行过该 binary。</li>
+<li>若继续用主线程实测的5.032，先做不依赖UVM的SV练习，例如module、interface、简单class、约束和波形；支持能力要按5.032文档逐项查，不由最新文档反推。</li>
+<li>若目标是本机免费跑UVM，优先安装/构建官方已声明支持UVM 2020-3.2的5.052，并检查其限制issue。保留5.032的版本信息，以免不同目录/WSL发行版中命令指向不清。</li>
+<li>示例的UVM版本也需匹配。Antmicro固定版本README下载UVM 2020.3.1；Verilator 5.052条目声明支持2020-3.2。不要随意混合一个工具声明的版本和另一个版本库文件。可以按官方支持矩阵分别选择组合，并记录其测试结果。</li>
+<li>Verilator与Icarus的部分二态/四态语义、随机化算法、SVA/coverage支持与商用事件驱动模拟器不同。小型开源环境适合写代码与掌握架构；目标岗位的商用模拟器仍可能揭示工具差异。</li>
+</ol>
+<h2 id="建议最小冒烟验证清单">建议最小冒烟验证清单</h2>
+<p>运行上游示例或自己的简化内存UVM环境时，一次只验证一个问题，并保留命令、版本、输出日志和种子：</p>
+<ol>
+<li><strong>编译阶段</strong>：编译 Accellera/匹配版本的 <code>uvm_pkg.sv</code>、项目 package、interface、testbench；检查宏路径和文件顺序，确认无 unsupported / warning-as-error。</li>
+<li><strong>UVM启动</strong>：通过 <code>+UVM_TESTNAME=&lt;test&gt;</code> 选择测试；输出确认UVM report server完成启动，且 test、env、agent、driver、monitor、scoreboard层次实际创建。</li>
+<li><strong>最小事务</strong>：送一笔已知写、再送一笔读；monitor从接口重建事务，scoreboard使用独立模型比较读回值。不能让checker直接读取DUT内部memory当期望值。</li>
+<li><strong>故障敏感性</strong>：暂时在DUT或数据通路注入一个可控错误，确认checker产生ERROR/FATAL并让进程以非零状态结束；恢复后相同测试应通过。</li>
+<li><strong>波形/日志</strong>：检查至少一个完整事务的时钟、复位、请求/响应和地址数据；记录波形格式、文件路径、seed和软件版本。</li>
+<li><strong>UVM功能边界</strong>：若环境用到virtual interface、constraint inheritance、DPI、RAL、covergroup或特定SVA，逐项加最小例子。某项失败时隔离最小代码，并与官方支持issue核对；不把“一个test通过”当成全功能兼容证明。</li>
+<li><strong>复现性</strong>：将 Antmicro 示例提交 SHA、Verilator tag/commit、UVM发行包版本、WSL发行版、C++编译器版本和精确命令写入本地说明。不要把企业代码或波形上传到在线服务。</li>
+</ol>
+<h2 id="选择建议">选择建议</h2>
+<ul>
+<li><strong>只想先学 UVM 架构、避免安装</strong>：用 EDA Playground + Riviera-PRO 跑一个公开的 FIFO / TinyALU 示例，确认页面当时可选后再投入时间。</li>
+<li><strong>希望本地、免费、工具链开源</strong>：使用 Verilator 5.052 + Accellera UVM 2020-3.2，配官方支持记录与限制清单；用 Antmicro 示例学习组件关系。要保留完整仿真器可移植性意识。</li>
+<li><strong>希望用无需购买的本地商业工具练习</strong>：可按Altair Licensing官方流程在DSim Cloud Portal生成Free Individual License；个人使用、单并发、90天有效，续领前需revoke。账号/申请流程本轮未实际验证，按官方条款使用。</li>
+<li><strong>已有验证环境必须用5.032</strong>：不要为了某个仓库示例就立刻改全局工具；先在独立目录/版本管理下验证，然后决定练习是否并存不同 Verilator 版本。</li>
+<li><strong>需要尽量贴近商用 UVM 面试环境</strong>：在开源工具打好组件职责和debug基础后，再用 EDA Playground Riviera-PRO 或公司/个人可合法访问的商用仿真器复核；在线环境只放公开的最小例子。</li>
+</ul>
+<hr />
+<p><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">← 返回学习导航</a></p>
+</article><div class="doc-bottom"><a href="/sv-uvm/">← 返回学习目录</a><a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">实验源码 ↗</a></div></main></div><footer>ChenWellesCxy HUST · SV / UVM 学习笔记 <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">查看源码仓库 ↗</a></footer></body></html>

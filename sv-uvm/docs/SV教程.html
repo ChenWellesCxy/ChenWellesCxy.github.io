@@ -1,0 +1,239 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>从 DRAM Pattern 到 SystemVerilog 验证 | ChenWellesCxy HUST</title><meta name="description" content="SV / UVM 学习教程、实验与 CoverageModel 实践。"><link rel="canonical" href="https://chenwellescxy.github.io/sv-uvm/docs/SV%E6%95%99%E7%A8%8B.html"><link rel="stylesheet" href="/site-shell.css"><link rel="stylesheet" href="/sv-uvm/style.css"></head><body><a class="skip" href="#content">跳到内容</a><header class="cw-site-header"><div class="cw-bar"><a class="cw-brand" href="/">ChenWellesCxy <span>HUST</span></a><nav class="cw-links" aria-label="网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><details class="cw-mobile"><summary>导航</summary><nav aria-label="手机网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></details></div></header><div class="reader"><aside><a class="back" href="/sv-uvm/">← SV / UVM 学习目录</a><details open><summary>本页章节</summary><nav aria-label="本页章节"><a href="#1-先把工作经验转换成验证职责">1. 先把工作经验转换成验证职责</a><a href="#2-环境与第一次运行">2. 环境与第一次运行</a><a href="#3-verilog复习电路同时工作过程里的语句依次执行">3. Verilog复习：电路同时工作，过程里的语句依次执行</a><a href="#4-类型logicbit枚举与结构体">4. 类型：logic、bit、枚举与结构体</a><a href="#5-taskfunctionpackage把pattern变成可复用操作">5. task、function、package：把Pattern变成可复用操作</a><a href="#6-自检tb先有判定再谈随机">6. 自检TB：先有判定，再谈随机</a><a href="#7-数组队列关联数组参考模型用什么存储">7. 数组、队列、关联数组：参考模型用什么存储</a><a href="#8-interface与clocking-block让信号访问有共同约定">8. interface与clocking block：让信号访问有共同约定</a><a href="#9-class事务是对象变量里放的是句柄">9. class：事务是“对象”，变量里放的是“句柄”</a><a href="#10-约束随机表达合法空间再观察覆盖">10. 约束随机：表达合法空间，再观察覆盖</a><a href="#11-并发mailbox与event通知不等于数据队列">11. 并发、mailbox与event：通知不等于数据队列</a><a href="#12-断言定义哪里不允许错">12. 断言：定义“哪里不允许错”</a><a href="#13-覆盖率统计发生过什么不替代正确性检查">13. 覆盖率：统计发生过什么，不替代正确性检查</a><a href="#14-从实验走进真实coveragemodel">14. 从实验走进真实CoverageModel</a><a href="#15-转入uvm之前的自测">15. 转入UVM之前的自测</a><a href="#查阅资料">查阅资料</a></nav></details><details><summary>其他文档</summary><nav aria-label="专题文档"><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a><a href="/sv-uvm/docs/SV%E6%95%99%E7%A8%8B.html" aria-current="page">从 Pattern 到 SystemVerilog</a><a href="/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html">UVM 入门教程</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html">SV 语言基础详解</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">SV 验证主题详解</a><a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html">UVM 官方资料详解</a><a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html">独立实现 CoverageModel</a><a href="/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html">参考项目精读</a><a href="/sv-uvm/labs/03_uvm/README.html">UVM 简化存储器实验</a><a href="/sv-uvm/docs/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5.html">开源项目实践</a><a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html">免费 SV/UVM 环境选型</a><a href="/sv-uvm/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.html">环境与验证记录</a><a href="/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html">学习资源调研</a></nav></details></aside><main id="content"><div class="doc-top"><div class="eyebrow">SV / UVM · 入门教程</div><h1>从 DRAM Pattern 到 SystemVerilog 验证</h1><div class="source">项目文档快照 · 2026-10-21 · <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning/blob/f09cfdaf87f25dce129bcc9a6b7c7824387e9d4b/docs/SV%E6%95%99%E7%A8%8B.md">查看原文 ↗</a></div></div><article><p>这是入门篇。系统深入阅读请接 <a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a>、<a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html">SV基础详解</a> 和 <a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">SV验证详解</a>，其中增加了详细语义、易错点和练习答案线索。</p>
+<p>你并非没有验证经验；当前缺少的是把经验写成数字验证环境的语言和组织能力。本教程先唤醒 Verilog 基础，再解释 SV 的抽象方式，最后走到 CoverageModel 的独立实现。没有时间安排，按理解程度阅读即可。</p>
+<p><strong>读法：先预测现象，再运行，再解释，再改一个条件。</strong> 复制代码能运行只是第一步。能解释为什么这样采样、能主动制造失败、能判断失败来自设计还是检查器，才形成验证能力。</p>
+<p>本文中实验01、02、04可在当前WSL的 Icarus上运行；标注“教学片段”的 class、约束、SVA、covergroup代码需支持对应特性的仿真器，不能直接当作当前Icarus的完整工程。运行记录单独保存，不把工具限制当成语言限制。</p>
+<h2 id="1-先把工作经验转换成验证职责">1. 先把工作经验转换成验证职责</h2>
+<table>
+<thead>
+<tr>
+<th>原来熟悉的事情</th>
+<th>数字验证对应职责</th>
+<th>需要补的代码能力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>选择命令与先后顺序</td>
+<td>stimulus / sequence</td>
+<td>task、transaction、约束与场景组合</td>
+</tr>
+<tr>
+<td>按时序发送Pattern</td>
+<td>driver</td>
+<td>时钟同步、握手、timeout、reset处理</td>
+</tr>
+<tr>
+<td>查看CA/DQ及内部波形</td>
+<td>monitor</td>
+<td>从真实引脚恢复事务，不依赖刺激脚本自报</td>
+</tr>
+<tr>
+<td>判断操作是否符合预期</td>
+<td>checker / scoreboard</td>
+<td>参考模型、自动比较、诊断信息</td>
+</tr>
+<tr>
+<td>关心是否测到关键条件</td>
+<td>functional coverage</td>
+<td>bins、cross、采样条件及覆盖闭环</td>
+</tr>
+<tr>
+<td>分析边界或非法命令</td>
+<td>assertions / negative tests</td>
+<td>时间关系、前提条件、预期失败</td>
+</tr>
+</tbody>
+</table>
+<p>FineSim还关心连续时间的电压、电流和模拟电路行为；本教程的数字模型不会复现这些。可迁移的是协议、场景、边界、检查与debug经验。也不要把平时使用的“Pattern Sequence”直接等同于 <code>uvm_sequence</code> 类，它们可能职责相似，但实现和调度机制不同。</p>
+<h2 id="2-环境与第一次运行">2. 环境与第一次运行</h2>
+<p>在 Ubuntu 终端中执行：</p>
+<pre><code class="language-bash">cd '/mnt/d/cxy/SV&amp;UVM Learning'
+bash scripts/run_labs.sh
+</code></pre>
+<p>路径有空格和 <code>&amp;</code>，因此必须加引号。脚本使用 <code>iverilog -g2012</code> 编译、<code>vvp</code> 执行，保留正常日志、故障日志和VCD。它还会检查故障用例确实失败，避免“检查器失效但回归全绿”。</p>
+<p>各实验的 <code>labs/&lt;实验&gt;/build/wave.vcd</code> 可以用已安装的 GTKWave 或其他 VCD 查看器打开。没有查看器也可直接打开 <code>docs/waves/*.svg</code>，这些图从同一次实验的真实 VCD 生成；只展示部分信号，完整信息在 VCD 中。</p>
+<p><strong>实验是教学协议，不是DRAM仿真器。</strong> 不需要生产TB、私有DUT或公司环境即可学习。</p>
+<h2 id="3-verilog复习电路同时工作过程里的语句依次执行">3. Verilog复习：电路同时工作，过程里的语句依次执行</h2>
+<p><code>module</code> 描述结构；多个 <code>always</code> 与 <code>initial</code> 并发运行。同一个 <code>begin/end</code> 内按语句顺序执行，但非阻塞赋值把更新推迟到NBA区域。仿真时间不等于代码行数：没有 <code>#</code>、<code>@</code>、<code>wait</code> 等时间控制的循环可能在同一仿真时刻完成，甚至零时间死循环。</p>
+<pre><code class="language-systemverilog">always @(posedge clk) begin
+  q &lt;= d;
+  q_delay &lt;= q;
+end
+</code></pre>
+<p>两个右值在过程执行时求值；<code>q_delay</code> 得到更新前的 <code>q</code>，形成两级流水。若把两句都换成阻塞赋值 <code>=</code>，第二句在同一过程中看到刚更新的 <code>q</code>，行为改变。</p>
+<ul>
+<li>时序RTL通常使用 <code>always_ff</code> + <code>&lt;=</code>。</li>
+<li>组合RTL通常使用 <code>always_comb</code> + <code>=</code>，给每条输出路径赋值，避免意外锁存器。</li>
+<li>TB里的局部计算、计数、对象赋值常用 <code>=</code>。不要把“所有always都用非阻塞”当规则。</li>
+<li><code>initial</code> 常用于TB初始化；<code>always</code> 会反复执行。DUT和TB共享时钟时，同一上升沿直接读写可能竞争。</li>
+</ul>
+<h3 id="实验01亲眼看到nba更新">实验01：亲眼看到NBA更新</h3>
+<p>源码：<code>labs/01_scheduling/tb.sv</code>。先预测15ns、25ns的 <code>q</code> 与 <code>q_delay</code>，再运行。</p>
+<p><img src="/sv-uvm/docs/waves/01_scheduling.svg" alt="实测NBA波形" /></p>
+<p>10ns下降沿把 <code>d=1</code>；15ns上升沿后 <code>q=1,q_delay=0</code>。20ns把 <code>d=0</code>；25ns后 <code>q=0,q_delay=1</code>。上升沿的 <code>$display</code> 在NBA更新前打印旧值；TB里的 <code>#1</code> 检查在1ns后读取更新值。这里 <code>#1</code> 只是小实验的观察窗口，不是生产环境通用防竞争方案。</p>
+<p><strong>动手：</strong> 先在纸上预测把第二句改为 <code>q_delay &lt;= d</code> 会怎样，再修改并看原checker是否失败。恢复后解释“时钟沿之前稳定输入”与“时钟沿之后更新输出”的区别。</p>
+<p><strong>验收：</strong> 不运行也能算出两拍结果；知道VCD同一物理时刻可能包含多个delta更新，普通波形图不一定展示调度区域细节。</p>
+<h2 id="4-类型logicbit枚举与结构体">4. 类型：logic、bit、枚举与结构体</h2>
+<p><code>logic</code> 是四态变量类型，可表示0/1/X/Z；<code>bit</code> 只有0/1，转换时可能丢掉未知信息。<code>wire</code> 表达网络连接，<code>logic</code> 不是“任何位置都能替代wire”的规则，尤其多驱动和双向总线需要考虑网络解析。</p>
+<pre><code class="language-systemverilog">logic [7:0] dq;          // 8位四态数据
+bit valid;              // 已经明确的内部布尔状态
+logic [7:0] memory[16];  // 16个8位元素，数组维度在名字后
+logic [1:0][3:0] ca;     // 共8位packed量，能按子字段选择
+typedef enum logic [1:0] {NOP, ACT, RD, PRE} cmd_t;
+typedef struct packed {
+  logic valid;
+  cmd_t cmd;
+  logic bank;
+} event_bits_t;
+</code></pre>
+<p>packed表示能连续看作位向量；unpacked数组表示一组元素。包含 <code>realtime</code> 等非整型字段的事件结构不能随意改成packed。数组越界、位宽截断和signed/unsigned混算，常比漏写关键字更难发现。</p>
+<p><code>==</code> 遇到X/Z可能得到X；<code>===</code> 总产生明确的0或1。在自检数据比较中常用 <code>!==</code>，让未知值也触发不匹配；但若把观察值提前存进 <code>bit</code>，X可能已经丢了。<code>$isunknown()</code> 可用于检测未知，需确认仿真器四态行为。Verilator主要是二态工具，不能用它的结果代替四态X传播实验。<a href="https://verilator.org/guide/latest/languages.html">官方说明</a></p>
+<p><strong>动手：</strong> 把一组命令的 <code>valid/cmd/bank/timestamp</code> 写为struct；解释 <code>logic [1:0][3:0] a</code> 与 <code>logic [3:0] a[2]</code> 的整体赋值差别。</p>
+<h2 id="5-taskfunctionpackage把pattern变成可复用操作">5. task、function、package：把Pattern变成可复用操作</h2>
+<p>function用于不消耗仿真时间的计算，task可以包含等待。function不能直接调用会阻塞的task或放入时间控制。task也不是必须耗时，只是允许耗时。<code>automatic</code> 让每次调用拥有独立局部存储，便于重入和并发；module内子程序默认静态的细节值得注意，class方法局部变量默认automatic。</p>
+<pre><code class="language-systemverilog">function automatic logic [7:0] merge_bits(
+  input logic [7:0] old_value, new_value, mask);
+  return (old_value &amp; ~mask) | (new_value &amp; mask);
+endfunction
+
+task automatic issue_write(input logic [3:0] a, input logic [7:0] data);
+  @(negedge clk);
+  req=1; wr=1; addr=a; wdata=data;
+  @(posedge clk);             // 等待接口采样
+  @(negedge clk); req=0;
+endtask
+</code></pre>
+<p><code>package</code> 放共享类型和函数。使用前先编译包，再 <code>import pkg_name::*;</code>；<code>include</code> 是文本包含，不会创建命名空间，重复include可能重复定义。教程参考项目正是“公共package + 采样interface + coverage module包含多个svh”的组织方式。</p>
+<p><strong>动手：</strong> 用 <code>merge_bits(8'hA5,8'h3C,8'h0F)</code> 手算结果，写3组自检；再把实验02的transfer拆成write/read两个包装task，而底层仍复用transfer。</p>
+<h2 id="6-自检tb先有判定再谈随机">6. 自检TB：先有判定，再谈随机</h2>
+<p>实验02是16个8位word的教学存储器，地址是word索引0..15。<code>ready = rst_n &amp;&amp; req</code>；每个 <code>req &amp;&amp; ready</code> 的上升沿完成一笔事务，写数据在NBA更新，读数据由当前地址组合输出。没有等待周期或多个未完成请求。</p>
+<p>实验03另用8位byte地址、4字节word的教学总线，两者是不同实验，不能直接混用地址索引。</p>
+<p><img src="/sv-uvm/docs/waves/02_memory.svg" alt="实测存储器波形前130ns" /></p>
+<p>先看信号关系：下降沿驱动请求，下一上升沿采样；driver保留请求直到下一下降沿撤销。<code>ready</code> 跟着req并不说明下降沿已经完成传输，协议规定的完成点仍是上升沿。</p>
+<p>源码 <code>labs/02_memory/tb.sv</code> 包含四个职责：</p>
+<ol>
+<li>DUT保存数据；复位清零。</li>
+<li><code>transfer</code> task驱动请求；只管接口动作。</li>
+<li>passive monitor在每次真实握手时观察读写、地址和数据。</li>
+<li>scoreboard根据观察到的写维护模型，再检查观察到的读。</li>
+</ol>
+<p>这里monitor和scoreboard放在同一个过程，便于初学；之后用class和UVM把职责拆开。参考模型不读取DUT内部 <code>mem</code> 作为期望值，否则DUT写错时模型也跟着错，就失去独立检查作用。</p>
+<p>正常场景含：复位后读零、遍历全部地址写读、20组随机地址写读、再次复位后读零。日志统计36次写、38次读，且三个seed运行。<code>+INJECT_ERROR</code>让DUT写入时翻转最低位，checker应报告地址、期望值和实测值并非零退出。</p>
+<p><strong>动手：</strong> 增加“同一地址连续写两次再读”；增加全0/全1数据；先手写预期，再加场景。若扩展事务数量，同步调整最终检查计数。不要删掉报错让它变绿。</p>
+<p><strong>验收：</strong> 能说明checker何时更新模型；能证明它会发现错误；能解释为什么只看 <code>$display(&quot;PASS&quot;)</code> 不足以证明测试有效。</p>
+<h2 id="7-数组队列关联数组参考模型用什么存储">7. 数组、队列、关联数组：参考模型用什么存储</h2>
+<p>固定数组适合小型已知深度memory；动态数组用 <code>new[n]</code> 动态分配；queue支持 <code>push_back/pop_front</code>，适合FIFO参考模型；关联数组适合只记录少量访问的大地址空间。</p>
+<pre><code class="language-systemverilog">// 教学片段：依工具支持编译
+byte unsigned expected_fifo[$];
+logic [31:0] expected_mem[longint unsigned];
+expected_fifo.push_back(8'h5A);
+if (expected_fifo.size()==0) $fatal(1,&quot;unexpected output&quot;);
+expected_byte = expected_fifo.pop_front();
+if (expected_mem.exists(address)) compare(actual,expected_mem[address]);
+</code></pre>
+<p>检查队列前判空，防止“取不到数据却按默认值继续比对”。关联数组中“没有这个地址”不同于“这个地址的预期数据是0”。遇到读未写地址，要先依据DUT规格决定行为，不能随便填一个期望值。</p>
+<p><strong>动手：</strong> 为FIFO列出空、满、同时push/pop、指针回绕、复位时有待比较数据这些场景。暂时不用UVM，先画预期队列长度变化。</p>
+<h2 id="8-interface与clocking-block让信号访问有共同约定">8. interface与clocking block：让信号访问有共同约定</h2>
+<p>interface把一组信号和相关访问规则放在一起；modport描述角色可见方向。class不能像module一样连实体端口，可以通过 <code>virtual interface</code> 句柄访问已实例化的interface。virtual interface不是创建一套新硬件，而是引用顶层已有的实例。</p>
+<pre><code class="language-systemverilog">// 教学片段
+interface bus_if(input logic clk);
+  logic req, ready, write;
+  logic [7:0] data;
+  clocking cb @(posedge clk);
+    default input #1step output #0;
+    input ready;
+    output req,write,data;
+  endclocking
+  modport DRIVER(clocking cb);
+endinterface
+</code></pre>
+<p><code>input #1step</code>取时钟事件前的样本，防止和同沿DUT更新混读；<code>output #0</code>的驱动遵循clocking block调度，不要和普通过程的 <code>#0</code> 等同。具体skew必须符合接口协议，并不是抄上面几行就能解决任何race。教学实验先用下降沿驱动、上升沿采样，把边界讲清楚，再引入clocking block。</p>
+<p><strong>验收：</strong> 能指出信号由谁驱动、何时稳定、何时采样。读源码时主动找同一信号的多个写入者。</p>
+<h2 id="9-class事务是对象变量里放的是句柄">9. class：事务是“对象”，变量里放的是“句柄”</h2>
+<p>struct适合值式数据记录；class适合带方法、继承和随机化的事务对象。<code>mem_item a;</code>只声明句柄，<code>a = new();</code>才创建对象。</p>
+<pre><code class="language-systemverilog">// 教学片段
+class mem_item;
+  rand bit write;
+  rand bit [3:0] addr;
+  rand bit [7:0] data;
+  function void print();
+    $display(&quot;write=%b addr=%h data=%h&quot;,write,addr,data);
+  endfunction
+endclass
+mem_item a,b;
+a=new(); a.addr=3;
+b=a; b.addr=5; // a.addr也变成5，因为是同一个对象
+</code></pre>
+<p>SV的 <code>new a</code> 是浅拷贝，嵌套class成员仍可能共用句柄；UVM的copy/clone通过字段或do_copy实现复制，也必须核实嵌套对象策略。monitor把对象发布给多个消费者之后，不应随意再改它。每笔创建新对象或显式复制，是常用约定。</p>
+<p>继承允许在基础item上增加字段；<code>virtual</code>方法允许通过基类句柄调用派生类实现；<code>$cast</code>做运行时类型检查，失败要处理。这是理解UVM factory override的前提。</p>
+<p><strong>动手：</strong> 写一个普通class，比较 <code>b=a</code> 与创建第二个对象后逐字段复制。再加一个嵌套对象，观察浅拷贝为什么还会共享部分状态。</p>
+<h2 id="10-约束随机表达合法空间再观察覆盖">10. 约束随机：表达合法空间，再观察覆盖</h2>
+<pre><code class="language-systemverilog">// 教学片段
+class request;
+  rand bit [7:0] addr;
+  rand bit write;
+  constraint legal_addr { addr inside {[8'h00:8'h3f]}; addr[1:0]==0; }
+  constraint mix { write dist {1:=3, 0:=1}; }
+endclass
+request r;
+r=new();
+if (!r.randomize()) $fatal(1,&quot;randomization failed&quot;);
+</code></pre>
+<p><code>rand</code>不会自动执行；每次 <code>randomize()</code> 才求解。<code>dist</code>表达权重，并不保证每四笔恰好三写一读；短仿真尤其会偏离比例。<code>inside</code>表达集合；inline constraint增加本次约束，与类约束同时成立。冲突时返回失败，必须检查返回值，不能忽略后继续使用旧字段。</p>
+<p>若要覆盖ACT→RD边界，不应该只随机等待0..1000拍并期待恰好撞到关键点；先有定向的门限-1、门限、门限+1，再随机探索组合。合法约束和故障注入要分开定义，避免约束让非法用例永远产生不了。</p>
+<p>保存seed、工具版本、用例和代码提交号。相同seed不保证不同工具或不同版本生成完全一致的序列。实验02是 <code>$urandom</code> 的程序式随机，不是class约束求解，两者不要混淆。</p>
+<h2 id="11-并发mailbox与event通知不等于数据队列">11. 并发、mailbox与event：通知不等于数据队列</h2>
+<p><code>fork...join</code>等所有子进程；<code>join_any</code>等任一个结束但其他进程继续存在；<code>join_none</code>启动后不等待，子进程开始时机受父进程挂起/结束影响。超时线程如果不清理，可能在后续场景中误报。</p>
+<p>mailbox是进程间传递数据的通道，<code>get</code>可以等数据；event只通知某件事发生。先触发再去 <code>@(e)</code> 等待，可能错过事件；<code>wait(e.triggered)</code>可处理同一time slot内已触发的情形，但event仍不是持久队列。</p>
+<p>参考项目用共享struct字段保存事件数据，再触发命名event。状态更新过程和covergroup被同一个event唤醒时，不能简单假定“代码写在前面就先更新”。独立实现时最好明确“构造完整样本→更新模型→显式采样”的顺序，或使用不可变样本与清楚的阶段边界。</p>
+<p><strong>动手：</strong> 描述两个消费者需要保存未来再比较的事务时，为什么不能只依靠一个共享 <code>last_event</code>。给出queue/mailbox或对象复制方案。</p>
+<h2 id="12-断言定义哪里不允许错">12. 断言：定义“哪里不允许错”</h2>
+<p>立即断言在过程执行到该语句时检查条件；并发断言在采样事件上检查跨时间关系。</p>
+<pre><code class="language-systemverilog">// 教学片段：并发SVA需支持它的仿真器
+assert property (@(posedge clk) disable iff (!rst_n)
+  (req &amp;&amp; !ready) |=&gt; req &amp;&amp; $stable({addr,write,wdata}));
+</code></pre>
+<p>这条教学协议要求：本拍请求没被接收，下拍仍保持请求及负载。<code>|=&gt;</code>从下一采样周期检查后件；<code>|-&gt;</code>从本次匹配结束周期检查。<code>$past</code>读取前一采样历史；复位后首次采样的历史有效性要单独考虑。<code>disable iff</code>用于禁用断言，语义不是coverpoint的 <code>iff</code>。</p>
+<p>如果永远没有出现 <code>req &amp;&amp; !ready</code>，断言可能真空通过，所以还需证明前件被激发。实验02没有等待周期，这条断言在它上面没有足够锻炼；必须扩展ready延迟再测试。断言检查局部规则，scoreboard检查端到端数据，二者互补。</p>
+<p><strong>动手：</strong> 为“RD之前同bank必须有ACT”写立即检查；为等待期间请求稳定设计一个会失败的波形。解释为什么一条断言0次失败并不一定意味着相关功能被测过。</p>
+<h2 id="13-覆盖率统计发生过什么不替代正确性检查">13. 覆盖率：统计发生过什么，不替代正确性检查</h2>
+<p>代码覆盖关心代码结构是否执行；功能覆盖关心需求场景是否观察到。测到一次非法时序，说明负例被激发，不表示DUT正确拒绝了它。</p>
+<pre><code class="language-systemverilog">// 教学片段：显式sample参数，避免对可变全局状态的采样竞争
+covergroup timing_cg with function sample(int gap, bit bank_id);
+  cp_gap: coverpoint gap {
+    bins too_short = {[0:2]};
+    bins edge_ok = {3};
+    bins later_ok = {[4:8]};
+  }
+  cp_bank: coverpoint bank_id;
+  gap_x_bank: cross cp_gap,cp_bank;
+endgroup
+</code></pre>
+<p>上例门限3是教学值；实际时序还可能是 <code>max(nCK要求,绝对时间要求)</code>，涉及单位、舍入和频率变化，不能直接搬到LPDDR6。<code>iff</code>决定本次是否采样，不删除不可能达到的bin；不可能场景需重新建模或合理设置 <code>ignore_bins</code>。<code>illegal_bins</code>是覆盖模型诊断的一部分，不代替完整协议checker。</p>
+<p>默认cross可能产生大量组合；先问每个组合对应什么需求、是否可达，再决定是否覆盖。覆盖100%只相对于当前模型，遗漏的需求根本不会出现在分母中。</p>
+<h3 id="实验04按bank保存act时间">实验04：按bank保存ACT时间</h3>
+<p>源码 <code>labs/04_coverage/tb.sv</code> 接收教学枚举命令，每个时钟一条；不包括真实CA编码。bank0 ACT后3拍RD、bank1 ACT后4拍RD；分别命中boundary与above。若只保存“最近一次全局ACT”，bank0就会算错。</p>
+<p><img src="/sv-uvm/docs/waves/04_coverage.svg" alt="实测按bank时序波形" /></p>
+<p>计数是可移植的过程式覆盖演示，<strong>不是仿真器covergroup数据库</strong>。正常结果 <code>below=0,boundary=1,above=1</code>。加 <code>+NEGATIVE</code>发送2拍间隔RD，命中below并由独立的失败判定报错；脚本确认非零退出。</p>
+<p><strong>动手：</strong> 加入bank0 PRE后RD、复位后RD、重复ACT、新旧ACT间隔选择的测试；写清哪些是合法场景。为每个新增规则设计一个会失败的例子。把过程式统计换为商业仿真器的显式sample covergroup时，保留checker。</p>
+<h2 id="14-从实验走进真实coveragemodel">14. 从实验走进真实CoverageModel</h2>
+<p>先读 <a href="/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html">参考项目精读</a>，定位公共类型，再追一条命令从物理采样到coverage的全过程。不要从六万行interface第一行逐句背诵，也不要把生成代码视为规范权威。</p>
+<p>再读 <a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html">独立实现CoverageModel</a>。最终作品应能回答：需求来自哪里；输入是什么；事件什么时候完整；同bank和不同bank如何区分；时间单位是什么；非法输入怎么处理；状态如何复位；如何证明漏采样/重复采样不会被掩盖。</p>
+<p>独立实现不要求一次复制整个LPDDR6模型。先关掉参考答案，对一个小需求写出数据类型、纯解码函数、状态模型、checker和测试；再对照参考实现解释差别。接着扩展边沿采样、命令拼接、MR和多bank场景。若手写小模型都无法验证正确，提前写生成器只会扩大错误。</p>
+<h2 id="15-转入uvm之前的自测">15. 转入UVM之前的自测</h2>
+<p>无需打分或按时间达标，只检查能否独立完成：</p>
+<ul>
+<li>看一段非阻塞赋值，能画出两拍波形。</li>
+<li>写一个task驱动请求，准确说明采样边沿。</li>
+<li>实现不读取DUT内部结果的参考模型。</li>
+<li>主动注入一个数据错误和一个时序错误，验证checker报错。</li>
+<li>解释struct值复制与class句柄赋值。</li>
+<li>说明约束失败、断言真空通过和覆盖率分母遗漏的区别。</li>
+<li>按“需求→刺激→观察→检查→覆盖→复现”讲清自己的小实验。</li>
+</ul>
+<p>随后读 <a href="/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html">UVM教程</a>，把同样的职责移到标准类框架。面试时清楚区分工作经历与个人学习工程，不把本教程实验说成量产UVM项目。</p>
+<h2 id="查阅资料">查阅资料</h2>
+<p>语义问题优先查 <a href="https://standards.ieee.org/ieee/1800/7743/">IEEE SystemVerilog</a>，工具选项查 <a href="https://steveicarus.github.io/iverilog/usage/index.html">Icarus文档</a> 与 <a href="https://verilator.org/guide/latest/languages.html">Verilator支持说明</a>。更完整的教程、课程和开源工程选型见 <a href="/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html">学习资源调研</a>。本教程的代码与讲解为本工作区原创教学材料，协议参数仅供练习。</p>
+<hr />
+<p><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">← 返回学习导航</a></p>
+</article><div class="doc-bottom"><a href="/sv-uvm/">← 返回学习目录</a><a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">实验源码 ↗</a></div></main></div><footer>ChenWellesCxy HUST · SV / UVM 学习笔记 <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">查看源码仓库 ↗</a></footer></body></html>

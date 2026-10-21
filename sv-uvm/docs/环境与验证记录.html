@@ -1,0 +1,71 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>环境与验证记录 | ChenWellesCxy HUST</title><meta name="description" content="SV / UVM 学习教程、实验与 CoverageModel 实践。"><link rel="canonical" href="https://chenwellescxy.github.io/sv-uvm/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.html"><link rel="stylesheet" href="/site-shell.css"><link rel="stylesheet" href="/sv-uvm/style.css"></head><body><a class="skip" href="#content">跳到内容</a><header class="cw-site-header"><div class="cw-bar"><a class="cw-brand" href="/">ChenWellesCxy <span>HUST</span></a><nav class="cw-links" aria-label="网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><details class="cw-mobile"><summary>导航</summary><nav aria-label="手机网站导航"><a href="/">首页</a><a href="/lpddr6/">LPDDR6</a><a href="/ai4ic/">AI4IC 学习图谱</a><a href="/sv-uvm/" aria-current="page">SV / UVM</a><a href="/essays/">随笔</a><a href="https://github.com/ChenWellesCxy" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></details></div></header><div class="reader"><aside><a class="back" href="/sv-uvm/">← SV / UVM 学习目录</a><details open><summary>本页章节</summary><nav aria-label="本页章节"><a href="#实测环境">实测环境</a><a href="#已执行的验证">已执行的验证</a><a href="#未完成的仿真验证">未完成的仿真验证</a><a href="#本地git策略">本地Git策略</a><a href="#官方主题教材扩展2026-10-09">官方主题教材扩展：2026-10-09</a><a href="#uvm-环境更新2026-10-09">UVM 环境更新：2026-10-09</a></nav></details><details><summary>其他文档</summary><nav aria-label="专题文档"><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">官方文档学习导航</a><a href="/sv-uvm/docs/SV%E6%95%99%E7%A8%8B.html">从 Pattern 到 SystemVerilog</a><a href="/sv-uvm/docs/UVM%E6%95%99%E7%A8%8B.html">UVM 入门教程</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E5%9F%BA%E7%A1%80%E7%AF%87.html">SV 语言基础详解</a><a href="/sv-uvm/docs/SV%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3_%E9%AA%8C%E8%AF%81%E7%AF%87.html">SV 验证主题详解</a><a href="/sv-uvm/docs/UVM%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AF%A6%E8%A7%A3.html">UVM 官方资料详解</a><a href="/sv-uvm/docs/%E7%8B%AC%E7%AB%8B%E5%AE%9E%E7%8E%B0CoverageModel.html">独立实现 CoverageModel</a><a href="/sv-uvm/docs/%E5%8F%82%E8%80%83%E9%A1%B9%E7%9B%AE%E7%B2%BE%E8%AF%BB.html">参考项目精读</a><a href="/sv-uvm/labs/03_uvm/README.html">UVM 简化存储器实验</a><a href="/sv-uvm/docs/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5.html">开源项目实践</a><a href="/sv-uvm/docs/UVM%E5%85%8D%E8%B4%B9%E7%8E%AF%E5%A2%83%E9%80%89%E5%9E%8B.html">免费 SV/UVM 环境选型</a><a href="/sv-uvm/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.html" aria-current="page">环境与验证记录</a><a href="/sv-uvm/docs/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E8%B0%83%E7%A0%94.html">学习资源调研</a></nav></details></aside><main id="content"><div class="doc-top"><div class="eyebrow">SV / UVM · 工具与资料</div><h1>环境与验证记录</h1><div class="source">项目文档快照 · 2026-10-21 · <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning/blob/f09cfdaf87f25dce129bcc9a6b7c7824387e9d4b/docs/%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95.md">查看原文 ↗</a></div></div><article><p>日期：2026-10-09。验证主体是助手提供的教材与实验，不代表用户已完成学习。</p>
+<h2 id="实测环境">实测环境</h2>
+<p>Windows工作目录 <code>D:\cxy\SV&amp;UVM Learning</code>；WSL2 Ubuntu。Linux内核 <code>6.18.33.2-microsoft-standard-WSL2</code>。Icarus Verilog 12.0 stable；Verilator 5.032 (2025-01-01, Debian 5.032-1)。Python3和g++可找到；首次PATH检查未找到make、VCS、Questa。没有安装额外仿真器、升级Verilator或修改系统包。</p>
+<h2 id="已执行的验证">已执行的验证</h2>
+<p>执行命令：<code>bash scripts/run_labs.sh</code>，工作目录为 <code>/mnt/d/cxy/SV&amp;UVM Learning</code>。</p>
+<table>
+<thead>
+<tr>
+<th>验证</th>
+<th>实际结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>实验01，两拍NBA结果检查</td>
+<td>PASS；15ns active区域读到旧q=0，随后检查更新后结果</td>
+</tr>
+<tr>
+<td>实验02，seed=1/2/17</td>
+<td>每个seed 36次写、38次读；全部通过</td>
+</tr>
+<tr>
+<td>实验02，<code>+INJECT_ERROR</code></td>
+<td>非零退出，日志含SCOREBOARD及expected/actual</td>
+</tr>
+<tr>
+<td>实验04，两个bank交错ACT/RD</td>
+<td>delta分别为3、4；boundary=1，above=1，通过</td>
+</tr>
+<tr>
+<td>实验04，<code>+NEGATIVE</code></td>
+<td>非零退出，日志含TIMING_VIOLATION</td>
+</tr>
+<tr>
+<td>波形导出</td>
+<td>三份真实VCD生成三张SVG；故障注入后重新跑正常用例恢复波形</td>
+</tr>
+</tbody>
+</table>
+<p>日志位于 <code>labs/*/build/</code>，忽略于Git；运行脚本可重建。波形SVG作为教程内容纳入Git。脚本会验证正常退出码，并检查负例必须非零且包含对应错误标识，避免把普通编译失败当成负例通过。</p>
+<h2 id="未完成的仿真验证">未完成的仿真验证</h2>
+<ul>
+<li><code>labs/03_uvm</code>：完整示例源码和Questa运行入口已写，只有shell语法和人工结构检查；<strong>未编译、未仿真</strong>。</li>
+<li>指定完整LPDDR6参考工程：已读关键源码并做精读文档，<strong>未编译、未生成它的覆盖数据库或波形</strong>。</li>
+<li>Antmicro开源UVM：已下载并记录commit，<strong>未构建、未运行</strong>。</li>
+<li>SV教程中的class/constraint/SVA/covergroup片段：概念代码，未逐一在商业仿真器验证。</li>
+</ul>
+<p>因此本次“已跑通”仅指实验01/02/04；不能扩大为“完整SV、UVM、LPDDR6工程均已跑通”。</p>
+<h2 id="本地git策略">本地Git策略</h2>
+<p>已有参考资料保留原内容并纳入本地基线；新教材、实验、脚本与状态文件纳入后续提交。外部下载目录、波形数据库、仿真构建目录排除。未添加远程，未上传任何文件。</p>
+<p>当前未配置用户Git姓名/邮箱，本次提交使用命令级助手身份，不更改全局设置。以后用户提供自己的提交身份时再调整。</p>
+<h2 id="官方主题教材扩展2026-10-09">官方主题教材扩展：2026-10-09</h2>
+<ul>
+<li>新增SV基础篇、SV验证篇、36章UVM详解、官方资料导航、免费环境选型；教材代码片段明确不等同于已运行工程。</li>
+<li>新增实验05：Icarus 12.0实测通过四态到二态转换、位宽与截断、signed/unsigned比较、packed struct、掩码函数与automatic任务并发调用。</li>
+<li><code>bash scripts/run_labs.sh</code>重新执行通过，原01/02/04和两个故障检测继续通过。</li>
+<li>Verilator5.052支持UVM2020-3.2以及DSim个人免费许可是查阅官方资料得到的结论，不是本机安装或运行结果。</li>
+</ul>
+<h2 id="uvm-环境更新2026-10-09">UVM 环境更新：2026-10-09</h2>
+<ul>
+<li>WSL 用户目录安装 Verilator 5.052：<code>/home/wellesc/.local/bin/verilator</code>。</li>
+<li>安装 Accellera UVM 2020.3.1：<code>/home/wellesc/tools/uvm/src</code>，并配置 <code>UVM_HOME</code>。</li>
+<li>新增 <code>labs/03_uvm/run_verilator.sh</code>，支持 <code>normal</code> 和 <code>fault</code> 两种模式；Verilator 生成目录放在 <code>/tmp</code>，规避 Windows 工作目录中的空格。</li>
+<li><code>bash labs/03_uvm/run_verilator.sh normal</code> 已实测通过：<code>checks=9 reads=9 writes=9 errors=0</code>，<code>UVM_ERROR=0</code>，<code>UVM_FATAL=0</code>。</li>
+<li><code>bash labs/03_uvm/run_verilator.sh fault</code> 已实测通过故障检测：<code>checks=9 reads=9 writes=9 errors=9</code>，9 条 <code>[SB_MISMATCH]</code>，并输出 <code>[EXPECTED_FAULT]</code>。</li>
+<li>正常模式生成真实波形 <code>labs/03_uvm/build_wave.vcd</code>；可用 <code>gtkwave</code> 查看。日志和VCD已加入忽略规则，不纳入Git提交。</li>
+<li>这些是助手在本机执行的证据，不代表用户已经掌握UVM；商业仿真器兼容性仍待后续验证。</li>
+</ul>
+<hr />
+<p><a href="/sv-uvm/docs/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E5%AF%BC%E8%88%AA.html">← 返回学习导航</a></p>
+</article><div class="doc-bottom"><a href="/sv-uvm/">← 返回学习目录</a><a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">实验源码 ↗</a></div></main></div><footer>ChenWellesCxy HUST · SV / UVM 学习笔记 <a href="https://github.com/ChenWellesCxy/SV-UVM-Learning">查看源码仓库 ↗</a></footer></body></html>
